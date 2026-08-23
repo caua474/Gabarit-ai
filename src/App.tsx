@@ -77,8 +77,8 @@ import { Header } from './components/Header';
  // isTodayStudyCompleted,
 //} from './utils/notifications';
 import { StudyMaterial, TutorPlan, ELI5Explanation } from './types';
-import { GabiAvatar } from './components/GabiAvatar';
-import * as db from './utils/db';
+//import { GabiAvatar } from './components/GabiAvatar';
+//import * as db from './utils/db';
 import { AlertCircle, GraduationCap, Sparkles, BookOpen, Calendar, Lightbulb, Zap, PenTool, Trophy, Swords, Share2, BookText, Calculator, ChevronDown, Timer, Keyboard } from 'lucide-react';
 
 const STREAK_KEY = 'assistente_estudos_bento_streak_v1';
