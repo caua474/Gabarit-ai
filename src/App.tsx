@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Header } from './components/Header';
 //import { NavigationTabs, AbaAtiva } from './components/NavigationTabs';
 import { OfflineStatusBanner } from './components/OfflineStatusBanner';
-import { ProgressStatsCard } from './components/ProgressStatsCard';
+//import { ProgressStatsCard } from './components/ProgressStatsCard';
 import { PopularTopicsSection } from './components/PopularTopicsSection';
 import { DayNightModeSection } from './components/DayNightModeSection';
 import { TextInputSection } from './components/TextInputSection';
