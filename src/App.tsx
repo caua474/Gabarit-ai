@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Header } from './components/Header';
+import  Header  from './components/Header';
 //import { NavigationTabs, AbaAtiva } from './components/NavigationTabs';
 //import { OfflineStatusBanner } from './components/OfflineStatusBanner';
 //import { ProgressStatsCard } from './components/ProgressStatsCard';
