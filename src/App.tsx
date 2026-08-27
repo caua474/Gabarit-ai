@@ -69,13 +69,6 @@ import  Header  from './components/Header';
 //import { CentralDeOpcoesSection } from './components/CentralDeOpcoesSection';
 //import { QuickQuizTriTooltip } from './components/QuickQuizTriTooltip';
 //import { BottomNavigationBar, PrimaryTab } from './components/BottomNavigationBar';
-//import {
-  //getNotificationSettings,
-  //saveNotificationSettings,
-// sendStreakReminderNotification,
-  //getNotificationPermission,
- // isTodayStudyCompleted,
-//} from './utils/notifications';
 //import { StudyMaterial, TutorPlan, ELI5Explanation } from './types';
 //import { GabiAvatar } from './components/GabiAvatar';
 //import * as db from './utils/db';
