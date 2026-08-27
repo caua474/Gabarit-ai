@@ -76,7 +76,7 @@ import  Header  from './components/Header';
   //getNotificationPermission,
  // isTodayStudyCompleted,
 //} from './utils/notifications';
-import { StudyMaterial, TutorPlan, ELI5Explanation } from './types';
+//import { StudyMaterial, TutorPlan, ELI5Explanation } from './types';
 //import { GabiAvatar } from './components/GabiAvatar';
 //import * as db from './utils/db';
 import { AlertCircle, GraduationCap, Sparkles, BookOpen, Calendar, Lightbulb, Zap, PenTool, Trophy, Swords, Share2, BookText, Calculator, ChevronDown, Timer, Keyboard } from 'lucide-react';
