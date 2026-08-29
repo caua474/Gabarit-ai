@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+/*import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import  Header  from './components/Header';
 import { NavigationTabs, AbaAtiva } from './components/NavigationTabs';
@@ -2774,6 +2774,16 @@ export default function App() {
         activePrimaryTab={activePrimaryTab}
         onSelectPrimaryTab={handleSelectPrimaryTab}
       />
+    </div>
+  );
+/*}
+import React from 'react';
+
+export default function App() {
+  return (
+    <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'sans-serif' }}>
+      <h1>O Gabarita AI está no ar!</h1>
+      <p>Se você está vendo esta mensagem, a estrutura base está funcionando.</p>
     </div>
   );
 }
