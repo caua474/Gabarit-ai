@@ -22,7 +22,7 @@ export function GabiAssistantModal({ isOpen, onClose }: GabiAssistantModalProps)
   ]);
   const [inputText, setInputText] = useState('');
 
-  if (!isOpen) return null;
+  if ((!isOpen) return null;
 
   const handleSend = () => {
     if (!inputText.trim()) return;
