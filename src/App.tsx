@@ -15,7 +15,7 @@ export function App() {
   const [isPlannerOpen, setIsPlannerOpen] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<StudyMaterial | null>(null);
 
-  // Dados de exemplo para exibição
+  // Dados de exemplo para exibição de materiais
   const sampleMaterials: StudyMaterial[] = [
     {
       id: '1',
@@ -37,9 +37,9 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500 selection:text-white">
-      <Header 
-        onOpenAssistant={() => setIsAssistantOpen(true)} 
-        onOpenPlanner={() => setIsPlannerOpen(true)} 
+      <Header
+        onOpenAssistant={() => setIsAssistantOpen(true)}
+        onOpenPlanner={() => setIsPlannerOpen(true)}
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
@@ -54,43 +54,46 @@ export function App() {
           />
         </div>
 
+        {/* Renderização Condicional das Abas */}
         {activePrimaryTab === 'materials' && (
           <BentoResults
             materials={sampleMaterials}
-            onSelectMaterial={(mat) => setSelectedMaterial(mat)}
+            onSelectMaterial={(material) => setSelectedMaterial(material)}
           />
         )}
 
-        {activePrimaryTab === 'plans' && (
-          <div className="p-8 bg-slate-900/40 rounded-2xl border border-slate-800 text-center">
-            <h2 className="text-lg font-bold text-white mb-2">Seus Planos de Estudo</h2>
-            <p className="text-slate-400 text-sm mb-4">Você ainda não gerou nenhum plano personalizado.</p>
+        {activePrimaryTab === 'planner' && (
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center">
+            <h2 className="text-xl font-bold text-white mb-2">Seus Planos de Estudo</h2>
+            <p className="text-slate-400 text-sm mb-6">Você ainda não gerou nenhum plano personalizado.</p>
             <button
               onClick={() => setIsPlannerOpen(true)}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition-all"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-colors"
             >
               Criar Novo Plano
             </button>
           </div>
         )}
 
-        {activePrimaryTab === 'gabi' && (
-          <div className="p-8 bg-slate-900/40 rounded-2xl border border-slate-800 text-center">
-            <h2 className="text-lg font-bold text-white mb-2">Tutor IA - Gabi</h2>
-            <p className="text-slate-400 text-sm mb-4">Tire dúvidas, peça resumos e tire fotos das suas questões.</p>
+        {activePrimaryTab === 'tutor' && (
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center">
+            <h2 className="text-xl font-bold text-white mb-2">Tutor IA - Gabi</h2>
+            <p className="text-slate-400 text-sm mb-6">Tire dúvidas, peça resumos e tire fotos das suas questões.</p>
             <button
               onClick={() => setIsAssistantOpen(true)}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition-all"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-colors"
             >
               Abrir Chat com a Gabi
             </button>
           </div>
         )}
-      {activePrimaryTab === 'profile' && (
-        <PerfilXP />
-      )}
-    </main>
 
+        {activePrimaryTab === 'perfil' && (
+          <PerfilXP />
+        )}
+      </main>
+
+      {/* Modais da Aplicação */}
       <GabiAssistantModal
         isOpen={isAssistantOpen}
         onClose={() => setIsAssistantOpen(false)}
