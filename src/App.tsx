@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import React, { useState } from 'react';
+import PerfilXP from './components/PerfilXP';
 import { Header } from './components/Header';
 import { OfflineStatusBanner } from './components/OfflineStatusBanner';
 import { NavigationTabs } from './components/NavigationTabs';
