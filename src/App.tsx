@@ -1,3 +1,4 @@
+import PerfilXP from './components/PerfilXP';
 import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { OfflineStatusBanner } from './components/OfflineStatusBanner';
@@ -85,7 +86,10 @@ export function App() {
             </button>
           </div>
         )}
-      </main>
+      {activePrimaryTab === 'profile' && (
+        <PerfilXP />
+      )}
+    </main>
 
       <GabiAssistantModal
         isOpen={isAssistantOpen}
