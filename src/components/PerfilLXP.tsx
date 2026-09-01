@@ -1,4 +1,4 @@
-import PerfilXP from './components/PerfilXP.tsx';
+import React, { useState } from 'react';
 import { Trophy, Flame, Award, Zap, Star, ShieldCheck, Share2, Sparkles, CheckCircle2 } from 'lucide-react';
 
 interface Achievement {
