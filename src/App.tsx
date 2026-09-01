@@ -1,4 +1,4 @@
-import PerfilXP from './components/PerfilXP';
+import React, { useState } from 'react';
 import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { OfflineStatusBanner } from './components/OfflineStatusBanner';
