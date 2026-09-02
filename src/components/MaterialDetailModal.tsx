@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, BookOpen, Tag, Calendar } from 'lucide-react';
+import { X, Tag, Calendar } from 'lucide-react';
 import { StudyMaterial } from '../types';
 
 interface MaterialDetailModalProps {
