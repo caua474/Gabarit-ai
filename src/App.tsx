@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PerfilXP from './components/PerfilXP';
 import { Header } from './components/Header';
 import { OfflineStatusBanner } from './components/OfflineStatusBanner';
@@ -6,8 +6,9 @@ import { NavigationTabs } from './components/NavigationTabs';
 import { BentoResults } from './components/BentoResults';
 import { GabiAssistantModal } from './components/GabiAssistantModal';
 import { StudyPlannerModal } from './components/StudyPlannerModal';
+import { CreateMaterialModal } from './components/CreateMaterialModal';
 import { StudyMaterial } from './types';
-import { Calendar, Clock, Sparkles } from 'lucide-react';
+import { Calendar, Clock, Sparkles, Plus } from 'lucide-react';
 
 interface StudyPlan {
   id: string;
@@ -16,36 +17,59 @@ interface StudyPlan {
   createdAt: string;
 }
 
+const DEFAULT_MATERIALS: StudyMaterial[] = [
+  {
+    id: '1',
+    title: 'Resumo de Trigonometria Avançada',
+    subject: 'Matemática',
+    content: 'Estudo detalhado sobre seno, cosseno e tangente aplicados a triângulos retângulos e equações circulares.',
+    createdAt: 'Hoje',
+    tags: ['EM', 'ENEM', 'Fórmulas'],
+  },
+  {
+    id: '2',
+    title: 'Introdução à Genética e Mendel',
+    subject: 'Biologia',
+    content: 'Primeira e segunda lei de Mendel, quadros de Punnett e hereditariedade de grupos sanguíneos ABO.',
+    createdAt: 'Ontem',
+    tags: ['Biologia', 'Genética'],
+  },
+];
+
 export function App() {
   const [activePrimaryTab, setActivePrimaryTab] = useState('materials');
   const [activeSecondaryTab, setActiveSecondaryTab] = useState('all');
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+  const [isCreateMaterialOpen, setIsCreateMaterialOpen] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<StudyMaterial | null>(null);
 
-  const [plans, setPlans] = useState<StudyPlan[]>([]);
+  // Carregar dados salvos no navegador ou usar o padrão
+  const [plans, setPlans] = useState<StudyPlan[]>(() => {
+    const saved = localStorage.getItem('gabarita_plans');
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  const sampleMaterials: StudyMaterial[] = [
-    {
-      id: '1',
-      title: 'Resumo de Trigonometria Avançada',
-      subject: 'Matemática',
-      content: 'Estudo detalhado sobre seno, cosseno e tangente aplicados a triângulos retângulos e equações circulares.',
-      createdAt: 'Hoje',
-      tags: ['EM', 'ENEM', 'Fórmulas'],
-    },
-    {
-      id: '2',
-      title: 'Introdução à Genética e Mendel',
-      subject: 'Biologia',
-      content: 'Primeira e segunda lei de Mendel, quadros de Punnett e hereditariedade de grupos sanguíneos ABO.',
-      createdAt: 'Ontem',
-      tags: ['Biologia', 'Genética'],
-    },
-  ];
+  const [materials, setMaterials] = useState<StudyMaterial[]>(() => {
+    const saved = localStorage.getItem('gabarita_materials');
+    return saved ? JSON.parse(saved) : DEFAULT_MATERIALS;
+  });
+
+  // Salvar alterações automaticamente
+  useEffect(() => {
+    localStorage.setItem('gabarita_plans', JSON.stringify(plans));
+  }, [plans]);
+
+  useEffect(() => {
+    localStorage.setItem('gabarita_materials', JSON.stringify(materials));
+  }, [materials]);
 
   const handleAddPlan = (newPlan: StudyPlan) => {
     setPlans((prev) => [newPlan, ...prev]);
+  };
+
+  const handleAddMaterial = (newMaterial: StudyMaterial) => {
+    setMaterials((prev) => [newMaterial, ...prev]);
   };
 
   return (
@@ -58,19 +82,29 @@ export function App() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         <OfflineStatusBanner />
 
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <NavigationTabs
             activePrimaryTab={activePrimaryTab}
             setActivePrimaryTab={setActivePrimaryTab}
             activeSecondaryTab={activeSecondaryTab}
             setActiveSecondaryTab={setActiveSecondaryTab}
           />
+
+          {activePrimaryTab === 'materials' && (
+            <button
+              onClick={() => setIsCreateMaterialOpen(true)}
+              className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 shrink-0 shadow-lg shadow-indigo-600/20"
+            >
+              <Plus size={16} />
+              Novo Material
+            </button>
+          )}
         </div>
 
         {/* Materiais */}
         {activePrimaryTab === 'materials' && (
           <BentoResults
-            materials={sampleMaterials}
+            materials={materials}
             onSelectMaterial={(material) => setSelectedMaterial(material)}
           />
         )}
@@ -153,6 +187,12 @@ export function App() {
         isOpen={isPlannerOpen}
         onClose={() => setIsPlannerOpen(false)}
         onAddPlan={handleAddPlan}
+      />
+
+      <CreateMaterialModal
+        isOpen={isCreateMaterialOpen}
+        onClose={() => setIsCreateMaterialOpen(false)}
+        onAddMaterial={handleAddMaterial}
       />
     </div>
   );
