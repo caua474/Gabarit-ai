@@ -5,11 +5,9 @@ import { NavigationTabs } from './components/NavigationTabs';
 import { BentoResults } from './components/BentoResults';
 import { GabiAssistantModal } from './components/GabiAssistantModal';
 import { StudyPlannerModal } from './components/StudyPlannerModal';
-import { CreateMaterialModal } from './components/CreateMaterialModal';
-import { MaterialDetailModal } from './components/MaterialDetailModal';
 import { AIStudioPlayground } from './components/AIStudioPlayground';
 import { StudyMaterial } from './types';
-import { Calendar, Clock, Sparkles, Plus, User } from 'lucide-react';
+import { Calendar, Clock, Sparkles, Plus, User, X } from 'lucide-react';
 
 interface StudyPlan {
   id: string;
@@ -42,8 +40,12 @@ export function App() {
   const [activeSecondaryTab, setActiveSecondaryTab] = useState('all');
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [isPlannerOpen, setIsPlannerOpen] = useState(false);
-  const [isCreateMaterialOpen, setIsCreateMaterialOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<StudyMaterial | null>(null);
+
+  const [newTitle, setNewTitle] = useState('');
+  const [newSubject, setNewSubject] = useState('');
+  const [newContent, setNewContent] = useState('');
 
   const [plans, setPlans] = useState<StudyPlan[]>(() => {
     const saved = localStorage.getItem('gabarita_plans');
@@ -67,8 +69,24 @@ export function App() {
     setPlans((prev) => [newPlan, ...prev]);
   };
 
-  const handleAddMaterial = (newMaterial: StudyMaterial) => {
-    setMaterials((prev) => [newMaterial, ...prev]);
+  const handleCreateMaterial = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTitle.trim() || !newSubject.trim()) return;
+
+    const newMat: StudyMaterial = {
+      id: Date.now().toString(),
+      title: newTitle,
+      subject: newSubject,
+      content: newContent || 'Sem conteúdo adicional.',
+      createdAt: 'Hoje',
+      tags: [newSubject],
+    };
+
+    setMaterials((prev) => [newMat, ...prev]);
+    setNewTitle('');
+    setNewSubject('');
+    setNewContent('');
+    setIsCreateModalOpen(false);
   };
 
   return (
@@ -91,7 +109,7 @@ export function App() {
 
           {activePrimaryTab === 'materials' && (
             <button
-              onClick={() => setIsCreateMaterialOpen(true)}
+              onClick={() => setIsCreateModalOpen(true)}
               className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 shrink-0 shadow-lg shadow-indigo-600/20"
             >
               <Plus size={16} />
@@ -195,16 +213,77 @@ export function App() {
         onAddPlan={handleAddPlan}
       />
 
-      <CreateMaterialModal
-        isOpen={isCreateMaterialOpen}
-        onClose={() => setIsCreateMaterialOpen(false)}
-        onAddMaterial={handleAddMaterial}
-      />
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 relative">
+            <button
+              onClick={() => setIsCreateModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+            >
+              <X size={20} />
+            </button>
+            <h3 className="text-lg font-bold text-white mb-4">Novo Material de Estudo</h3>
+            <form onSubmit={handleCreateMaterial} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1">Título</label>
+                <input
+                  type="text"
+                  required
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  placeholder="Ex: Resumo de Física Quântica"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1">Matéria</label>
+                <input
+                  type="text"
+                  required
+                  value={newSubject}
+                  onChange={(e) => setNewSubject(e.target.value)}
+                  placeholder="Ex: Física"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1">Conteúdo</label>
+                <textarea
+                  rows={3}
+                  value={newContent}
+                  onChange={(e) => setNewContent(e.target.value)}
+                  placeholder="Digite as anotações..."
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 resize-none"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl text-sm transition-colors"
+              >
+                Salvar Material
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
-      <MaterialDetailModal
-        material={selectedMaterial}
-        onClose={() => setSelectedMaterial(null)}
-      />
+      {selectedMaterial && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 relative">
+            <button
+              onClick={() => setSelectedMaterial(null)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+            >
+              <X size={20} />
+            </button>
+            <span className="text-xs bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2.5 py-1 rounded-lg">
+              {selectedMaterial.subject}
+            </span>
+            <h3 className="text-xl font-bold text-white mt-3 mb-2">{selectedMaterial.title}</h3>
+            <p className="text-slate-300 text-sm whitespace-pre-wrap">{selectedMaterial.content}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
