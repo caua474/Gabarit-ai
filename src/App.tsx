@@ -7,6 +7,7 @@ import { BentoResults } from './components/BentoResults';
 import { GabiAssistantModal } from './components/GabiAssistantModal';
 import { StudyPlannerModal } from './components/StudyPlannerModal';
 import { CreateMaterialModal } from './components/CreateMaterialModal';
+import { MaterialDetailModal } from './components/MaterialDetailModal';
 import { StudyMaterial } from './types';
 import { Calendar, Clock, Sparkles, Plus } from 'lucide-react';
 
@@ -44,7 +45,6 @@ export function App() {
   const [isCreateMaterialOpen, setIsCreateMaterialOpen] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<StudyMaterial | null>(null);
 
-  // Carregar dados salvos no navegador ou usar o padrão
   const [plans, setPlans] = useState<StudyPlan[]>(() => {
     const saved = localStorage.getItem('gabarita_plans');
     return saved ? JSON.parse(saved) : [];
@@ -55,7 +55,6 @@ export function App() {
     return saved ? JSON.parse(saved) : DEFAULT_MATERIALS;
   });
 
-  // Salvar alterações automaticamente
   useEffect(() => {
     localStorage.setItem('gabarita_plans', JSON.stringify(plans));
   }, [plans]);
@@ -193,6 +192,11 @@ export function App() {
         isOpen={isCreateMaterialOpen}
         onClose={() => setIsCreateMaterialOpen(false)}
         onAddMaterial={handleAddMaterial}
+      />
+
+      <MaterialDetailModal
+        material={selectedMaterial}
+        onClose={() => setSelectedMaterial(null)}
       />
     </div>
   );
