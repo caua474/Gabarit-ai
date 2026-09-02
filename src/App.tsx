@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import PerfilXP from './components/PerfilXP';
 import { Header } from './components/Header';
 import { OfflineStatusBanner } from './components/OfflineStatusBanner';
 import { NavigationTabs } from './components/NavigationTabs';
@@ -9,7 +8,7 @@ import { StudyPlannerModal } from './components/StudyPlannerModal';
 import { CreateMaterialModal } from './components/CreateMaterialModal';
 import { MaterialDetailModal } from './components/MaterialDetailModal';
 import { StudyMaterial } from './types';
-import { Calendar, Clock, Sparkles, Plus } from 'lucide-react';
+import { Calendar, Clock, Sparkles, Plus, User } from 'lucide-react';
 
 interface StudyPlan {
   id: string;
@@ -171,9 +170,18 @@ export function App() {
           </div>
         )}
 
-        {/* Perfil & XP */}
+        {/* Perfil */}
         {activePrimaryTab === 'perfil' && (
-          <PerfilXP />
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center">
+            <div className="w-16 h-16 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <User size={32} />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-1">Perfil do Estudante</h2>
+            <p className="text-slate-400 text-sm mb-4">Acompanhe seu progresso e nivel de XP.</p>
+            <div className="inline-block bg-slate-800 border border-slate-700 px-4 py-2 rounded-xl text-xs text-indigo-300">
+              Nível 1 • 150 XP
+            </div>
+          </div>
         )}
       </main>
 
