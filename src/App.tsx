@@ -7,6 +7,7 @@ import { GabiAssistantModal } from './components/GabiAssistantModal';
 import { StudyPlannerModal } from './components/StudyPlannerModal';
 import { CreateMaterialModal } from './components/CreateMaterialModal';
 import { MaterialDetailModal } from './components/MaterialDetailModal';
+import { AIStudioPlayground } from './components/AIStudioPlayground';
 import { StudyMaterial } from './types';
 import { Calendar, Clock, Sparkles, Plus, User } from 'lucide-react';
 
@@ -99,7 +100,6 @@ export function App() {
           )}
         </div>
 
-        {/* Materiais */}
         {activePrimaryTab === 'materials' && (
           <BentoResults
             materials={materials}
@@ -107,7 +107,6 @@ export function App() {
           />
         )}
 
-        {/* Planos de Estudo */}
         {activePrimaryTab === 'planner' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center bg-slate-900 border border-slate-800 rounded-2xl p-6">
@@ -156,7 +155,6 @@ export function App() {
           </div>
         )}
 
-        {/* Tutor IA */}
         {activePrimaryTab === 'tutor' && (
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center">
             <h2 className="text-xl font-bold text-white mb-2">Tutor IA - Gabi</h2>
@@ -170,14 +168,15 @@ export function App() {
           </div>
         )}
 
-        {/* Perfil */}
+        {activePrimaryTab === 'aistudio' && <AIStudioPlayground />}
+
         {activePrimaryTab === 'perfil' && (
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center">
             <div className="w-16 h-16 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <User size={32} />
             </div>
             <h2 className="text-xl font-bold text-white mb-1">Perfil do Estudante</h2>
-            <p className="text-slate-400 text-sm mb-4">Acompanhe seu progresso e nivel de XP.</p>
+            <p className="text-slate-400 text-sm mb-4">Acompanhe seu progresso e nível de XP.</p>
             <div className="inline-block bg-slate-800 border border-slate-700 px-4 py-2 rounded-xl text-xs text-indigo-300">
               Nível 1 • 150 XP
             </div>
