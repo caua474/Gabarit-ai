@@ -36,7 +36,7 @@ const DEFAULT_MATERIALS: StudyMaterial[] = [
   },
 ];
 
-export function App() {
+export default function App() {
   const [activePrimaryTab, setActivePrimaryTab] = useState('materials');
   const [activeSecondaryTab, setActiveSecondaryTab] = useState('all');
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
