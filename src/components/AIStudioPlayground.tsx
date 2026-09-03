@@ -1,6 +1,13 @@
-import React, { useState } from 'react';
-import { Sparkles, Play, Code2, RotateCcw, Sliders, Loader2, Bot, Copy, Check } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Sparkles, Play, Code2, RotateCcw, Sliders, Loader2, Bot, Copy, Check, Paperclip, Image as ImageIcon, X } from 'lucide-react';
 import { GetCodeModal } from './GetCodeModal';
+
+interface AttachedFile {
+  file: File;
+  previewUrl: string;
+  base64Data: string;
+  mimeType: string;
+}
 
 export function AIStudioPlayground() {
   const [prompt, setPrompt] = useState('');
@@ -10,13 +17,50 @@ export function AIStudioPlayground() {
   const [isGetCodeOpen, setIsGetCodeOpen] = useState(false);
   const [showParams, setShowParams] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [attachedFile, setAttachedFile] = useState<AttachedFile | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Parâmetros do Modelo
   const [selectedModel, setSelectedModel] = useState('gemini-1.5-flash');
   const [temperature, setTemperature] = useState(0.7);
 
+  // Converte imagem selecionada para Base64
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor, selecione um arquivo de imagem (JPG, PNG, WEBP).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      const base64Data = result.split(',')[1];
+      setAttachedFile({
+        file,
+        previewUrl: URL.createObjectURL(file),
+        base64Data,
+        mimeType: file.type,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveFile = () => {
+    if (attachedFile?.previewUrl) {
+      URL.revokeObjectURL(attachedFile.previewUrl);
+    }
+    setAttachedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleExecute = async () => {
-    if (!prompt.trim() || isLoading) return;
+    if ((!prompt.trim() && !attachedFile) || isLoading) return;
 
     setIsLoading(true);
     setResponse('');
@@ -27,16 +71,26 @@ export function AIStudioPlayground() {
         throw new Error('Chave de API não encontrada na Vercel.');
       }
 
-      const contentsPayload = [];
+      const partsPayload: any[] = [];
 
-      // Inclui a instrução do sistema se preenchida
-      const fullSystemPrompt = systemInstruction.trim()
+      // Inclui a imagem no payload se houver anexo
+      if (attachedFile) {
+        partsPayload.push({
+          inlineData: {
+            mimeType: attachedFile.mimeType,
+            data: attachedFile.base64Data,
+          },
+        });
+      }
+
+      // Inclui a instrução do sistema e o texto do prompt
+      const textContent = systemInstruction.trim()
         ? `[Instrução de Sistema: ${systemInstruction}]\n\n${prompt}`
         : prompt;
 
-      contentsPayload.push({
-        parts: [{ text: fullSystemPrompt }],
-      });
+      if (textContent.trim()) {
+        partsPayload.push({ text: textContent });
+      }
 
       const apiRes = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`,
@@ -46,7 +100,11 @@ export function AIStudioPlayground() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            contents: contentsPayload,
+            contents: [
+              {
+                parts: partsPayload,
+              },
+            ],
             generationConfig: {
               temperature: temperature,
             },
@@ -72,6 +130,7 @@ export function AIStudioPlayground() {
   const handleClear = () => {
     setPrompt('');
     setResponse('');
+    handleRemoveFile();
   };
 
   const handleCopyResponse = () => {
@@ -91,7 +150,7 @@ export function AIStudioPlayground() {
           </div>
           <div>
             <h2 className="font-bold text-white text-base">Google AI Studio Playground</h2>
-            <p className="text-xs text-slate-400">Ambiente de testes para prototipar e engenharia de prompt</p>
+            <p className="text-xs text-slate-400">Suporte Multimodal: Texto e Análise de Imagens</p>
           </div>
         </div>
 
@@ -118,7 +177,7 @@ export function AIStudioPlayground() {
         </div>
       </div>
 
-      {/* Painel de Parâmetros Ajustáveis (Gaveta Sanfona) */}
+      {/* Painel de Parâmetros Ajustáveis */}
       {showParams && (
         <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-2 gap-4 animate-fadeIn">
           <div>
@@ -128,8 +187,8 @@ export function AIStudioPlayground() {
               onChange={(e) => setSelectedModel(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
             >
-              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Mais Rápido)</option>
-              <option value="gemini-1.5-pro">Gemini 1.5 Pro (Mais Preciso)</option>
+              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Mais Rápido & Multimodal)</option>
+              <option value="gemini-1.5-pro">Gemini 1.5 Pro (Mais Preciso & Multimodal)</option>
             </select>
           </div>
 
@@ -167,15 +226,59 @@ export function AIStudioPlayground() {
 
       {/* Área Principal de Entrada / Saída */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Lado Esquerdo: Prompt do Usuário */}
+        {/* Lado Esquerdo: Prompt e Anexo do Usuário */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between space-y-3 min-h-[300px]">
           <div className="space-y-2 flex-1 flex flex-col">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Prompt de Entrada</span>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Prompt de Entrada</span>
+              
+              {/* Botão de Anexo de Imagem */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs text-indigo-400 hover:text-indigo-300 bg-indigo-950/60 hover:bg-indigo-900/60 px-2.5 py-1 rounded-lg border border-indigo-800/50 flex items-center gap-1.5 transition-colors"
+              >
+                <Paperclip size={14} />
+                Anexar Imagem
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+              />
+            </div>
+
+            {/* Pré-visualização da Imagem Anexada */}
+            {attachedFile && (
+              <div className="relative group w-fit my-1">
+                <div className="flex items-center gap-2 bg-slate-950 border border-indigo-500/40 p-2 rounded-xl text-xs text-indigo-200">
+                  <img
+                    src={attachedFile.previewUrl}
+                    alt="Preview"
+                    className="w-12 h-12 object-cover rounded-lg border border-slate-800"
+                  />
+                  <div className="max-w-[150px] truncate">
+                    <p className="font-medium truncate text-white">{attachedFile.file.name}</p>
+                    <p className="text-[10px] text-slate-400">{(attachedFile.file.size / 1024).toFixed(1)} KB</p>
+                  </div>
+                  <button
+                    onClick={handleRemoveFile}
+                    className="p-1 text-slate-400 hover:text-rose-400 rounded-lg transition-colors ml-2"
+                    title="Remover Imagem"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
+
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Escreva seu prompt de teste aqui..."
-              className="w-full flex-1 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-indigo-500 resize-none min-h-[180px]"
+              placeholder="Escreva seu prompt ou faça uma pergunta sobre a imagem anexada..."
+              className="w-full flex-1 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-indigo-500 resize-none min-h-[160px]"
             />
           </div>
 
@@ -190,13 +293,13 @@ export function AIStudioPlayground() {
 
             <button
               onClick={handleExecute}
-              disabled={isLoading || !prompt.trim()}
+              disabled={isLoading || (!prompt.trim() && !attachedFile)}
               className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20"
             >
               {isLoading ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
-                  Gerando...
+                  Analisando...
                 </>
               ) : (
                 <>
@@ -208,7 +311,7 @@ export function AIStudioPlayground() {
           </div>
         </div>
 
-        {/* Lado Direito: Resposta do Modelo */}
+        {/* Lado Direito: Resposta da IA */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between min-h-[300px] relative">
           <div className="space-y-2 flex-1">
             <div className="flex items-center justify-between">
@@ -231,13 +334,13 @@ export function AIStudioPlayground() {
               {isLoading ? (
                 <div className="h-full flex flex-col items-center justify-center text-slate-500 gap-2">
                   <Loader2 size={24} className="animate-spin text-indigo-400" />
-                  <span>A IA está processando seu prompt...</span>
+                  <span>A IA está analisando {attachedFile ? 'sua imagem e texto' : 'seu prompt'}...</span>
                 </div>
               ) : response ? (
                 response
               ) : (
                 <span className="text-slate-600 italic">
-                  Escreva um prompt no campo ao lado e clique em "Executar Prompt" para ver a resposta em tempo real.
+                  Anexe uma imagem ou escreva um prompt no campo ao lado e clique em "Executar Prompt".
                 </span>
               )}
             </div>
