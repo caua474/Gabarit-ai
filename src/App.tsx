@@ -8,7 +8,7 @@ import { StudyPlannerModal } from './components/StudyPlannerModal';
 import { AIStudioPlayground } from './components/AIStudioPlayground';
 import { UpgradeModal } from './components/UpgradeModal';
 import { StudyMaterial } from './types';
-import { X, Zap } from 'lucide-react';
+import { X, Zap, Trophy, User, Target, BookOpen } from 'lucide-react';
 
 interface StudyPlan {
   id: string;
@@ -41,6 +41,7 @@ export default function App() {
   const [activeSecondaryTab, setActiveSecondaryTab] = useState('all');
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<StudyMaterial | null>(null);
@@ -74,6 +75,17 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('gabarita_materials', JSON.stringify(materials));
   }, [materials]);
+
+  const handleTabSelect = (tabId: string) => {
+    setActivePrimaryTab(tabId);
+    if (tabId === 'plans' || tabId === 'planner') {
+      setIsPlannerOpen(true);
+    } else if (tabId === 'tutor' || tabId === 'assistant') {
+      setIsAssistantOpen(true);
+    } else if (tabId === 'profile') {
+      setIsProfileOpen(true);
+    }
+  };
 
   const handleAddPlan = (newPlan: StudyPlan) => {
     setPlans((prev) => [newPlan, ...prev]);
@@ -124,7 +136,7 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
         <NavigationTabs
           activePrimaryTab={activePrimaryTab}
-          setActivePrimaryTab={setActivePrimaryTab}
+          setActivePrimaryTab={handleTabSelect}
           activeSecondaryTab={activeSecondaryTab}
           setActiveSecondaryTab={setActiveSecondaryTab}
         />
@@ -158,6 +170,59 @@ export default function App() {
         onClose={() => setIsUpgradeOpen(false)}
         onSuccess={() => alert('Plano Pro Ativado com sucesso!')}
       />
+
+      {/* Modal de Perfil & XP */}
+      {isProfileOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-5 relative shadow-2xl">
+            <button
+              onClick={() => setIsProfileOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-indigo-600/20 border border-indigo-500/40 rounded-full flex items-center justify-center mx-auto text-indigo-400">
+                <User size={32} />
+              </div>
+              <h2 className="text-xl font-bold text-white">Seu Perfil de Estudante</h2>
+              <p className="text-xs text-slate-400">Acompanhe seu progresso e pontos de experiência.</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center space-y-1">
+                <Trophy size={20} className="text-amber-400 mx-auto" />
+                <span className="block text-xl font-extrabold text-white">1.250 XP</span>
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider">Pontos Totais</span>
+              </div>
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center space-y-1">
+                <Target size={20} className="text-indigo-400 mx-auto" />
+                <span className="block text-xl font-extrabold text-white">Nível 4</span>
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider">Estudante Dedicado</span>
+              </div>
+            </div>
+
+            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+              <div className="flex justify-between text-xs text-slate-300 font-medium">
+                <span className="flex items-center gap-1.5"><BookOpen size={14} className="text-indigo-400" /> Materiais Salvos</span>
+                <span className="font-bold text-white">{materials.length}</span>
+              </div>
+              <div className="flex justify-between text-xs text-slate-300 font-medium">
+                <span className="flex items-center gap-1.5"><Target size={14} className="text-emerald-400" /> Planos de Estudo</span>
+                <span className="font-bold text-white">{plans.length}</span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsProfileOpen(false)}
+              className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
 
       {selectedMaterial && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
