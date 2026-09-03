@@ -36,6 +36,10 @@ const DEFAULT_MATERIALS: StudyMaterial[] = [
   },
 ];
 
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isUpgradeOpen, setIsUpgradeOpen] = useState(false); // <-- ADICIONE ESTA LINHA AQUI
 export function App() {
   const [activePrimaryTab, setActivePrimaryTab] = useState('materials');
   const [activeSecondaryTab, setActiveSecondaryTab] = useState('all');
