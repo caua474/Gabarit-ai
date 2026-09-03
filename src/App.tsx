@@ -135,7 +135,8 @@ export function App() {
           <BentoResults
             materials={materials}
             activeSecondaryTab={activeSecondaryTab}
-            onSelectMaterial={(mat: any) => setSelectedMaterial(mat)}
+            onSelectMaterial={(mat: StudyMaterial) => setSelectedMaterial(mat)}
+            onOpenCreateModal={() => setIsCreateModalOpen(true)}
           />
         )}
       </main>
