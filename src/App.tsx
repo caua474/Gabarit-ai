@@ -43,7 +43,6 @@ export function App() {
   const [isPlannerOpen, setIsPlannerOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
-  const [selectedMaterial, setSelectedMaterial] = useState<StudyMaterial | null>(null);
 
   const [newTitle, setNewTitle] = useState('');
   const [newSubject, setNewSubject] = useState('');
@@ -96,13 +95,13 @@ export function App() {
       {/* Banner Offline */}
       <OfflineStatusBanner />
 
-      {/* Header Principal (Sem props extras) */}
+      {/* Header */}
       <Header
         onOpenAssistant={() => setIsAssistantOpen(true)}
         onOpenPlanner={() => setIsPlannerOpen(true)}
       />
 
-      {/* Faixa Promocional PRO */}
+      {/* Banner Promocional PRO */}
       <div className="bg-gradient-to-r from-indigo-900/40 via-purple-900/30 to-slate-900 border-b border-indigo-500/20 px-4 py-2.5 flex items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2 text-indigo-300">
           <Zap size={15} className="text-amber-400 fill-amber-400 shrink-0" />
@@ -131,7 +130,7 @@ export function App() {
           <BentoResults
             materials={materials}
             activeSecondaryTab={activeSecondaryTab}
-            onSelectMaterial={(mat) => setSelectedMaterial(mat)}
+            onSelectMaterial={() => {}}
             onOpenCreateModal={() => setIsCreateModalOpen(true)}
           />
         )}
@@ -228,4 +227,3 @@ export function App() {
     </div>
   );
 }
-
