@@ -93,21 +93,20 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
-      {/* Banner de Status Offline */}
+      {/* Banner Offline */}
       <OfflineStatusBanner />
 
-      {/* Header Principal */}
+      {/* Header Principal (Sem props extras) */}
       <Header
         onOpenAssistant={() => setIsAssistantOpen(true)}
         onOpenPlanner={() => setIsPlannerOpen(true)}
-        onOpenUpgrade={() => setIsUpgradeOpen(true)}
       />
 
-      {/* Faixa Promocional do Plano PRO */}
+      {/* Faixa Promocional PRO */}
       <div className="bg-gradient-to-r from-indigo-900/40 via-purple-900/30 to-slate-900 border-b border-indigo-500/20 px-4 py-2.5 flex items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2 text-indigo-300">
           <Zap size={15} className="text-amber-400 fill-amber-400 shrink-0" />
-          <span><strong>GabaritaAI Pro:</strong> Perguntas ilimitadas, leitor de imagem e modelo Gemini 1.5 Pro por apenas R$ 5,00/mês.</span>
+          <span><strong>GabaritaAI Pro:</strong> Perguntas ilimitadas, leitor de imagem e modelo Gemini 1.5 Pro por R$ 5,00/mês.</span>
         </div>
         <button
           onClick={() => setIsUpgradeOpen(true)}
@@ -119,7 +118,6 @@ export function App() {
 
       {/* Conteúdo Principal */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
-        {/* Navegação por Abas */}
         <NavigationTabs
           activePrimaryTab={activePrimaryTab}
           setActivePrimaryTab={setActivePrimaryTab}
@@ -127,7 +125,6 @@ export function App() {
           setActiveSecondaryTab={setActiveSecondaryTab}
         />
 
-        {/* Exibição da Aba Selecionada */}
         {activePrimaryTab === 'playground' ? (
           <AIStudioPlayground />
         ) : (
@@ -140,10 +137,11 @@ export function App() {
         )}
       </main>
 
-      {/* Modais da Aplicação */}
+      {/* Modais */}
       <GabiAssistantModal
         isOpen={isAssistantOpen}
         onClose={() => setIsAssistantOpen(false)}
+        onOpenUpgrade={() => setIsUpgradeOpen(true)}
       />
 
       <StudyPlannerModal
@@ -158,7 +156,7 @@ export function App() {
         onSuccess={() => alert('Plano Pro Ativado com sucesso!')}
       />
 
-      {/* Modal para Criar Novo Material */}
+      {/* Modal Criar Material */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4">
@@ -230,4 +228,3 @@ export function App() {
     </div>
   );
 }
-
