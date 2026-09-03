@@ -43,19 +43,28 @@ export function App() {
   const [isPlannerOpen, setIsPlannerOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
+  const [selectedMaterial, setSelectedMaterial] = useState<StudyMaterial | null>(null);
 
   const [newTitle, setNewTitle] = useState('');
   const [newSubject, setNewSubject] = useState('');
   const [newContent, setNewContent] = useState('');
 
   const [plans, setPlans] = useState<StudyPlan[]>(() => {
-    const saved = localStorage.getItem('gabarita_plans');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('gabarita_plans');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
 
   const [materials, setMaterials] = useState<StudyMaterial[]>(() => {
-    const saved = localStorage.getItem('gabarita_materials');
-    return saved ? JSON.parse(saved) : DEFAULT_MATERIALS;
+    try {
+      const saved = localStorage.getItem('gabarita_materials');
+      return saved ? JSON.parse(saved) : DEFAULT_MATERIALS;
+    } catch {
+      return DEFAULT_MATERIALS;
+    }
   });
 
   useEffect(() => {
@@ -126,7 +135,8 @@ export function App() {
           <BentoResults
             materials={materials}
             activeSecondaryTab={activeSecondaryTab}
-            onSelectMaterial={() => {}}
+            onSelectMaterial={(mat) => setSelectedMaterial(mat)}
+            onOpenCreateModal={() => setIsCreateModalOpen(true)}
           />
         )}
       </main>
@@ -148,6 +158,29 @@ export function App() {
         onClose={() => setIsUpgradeOpen(false)}
         onSuccess={() => alert('Plano Pro Ativado com sucesso!')}
       />
+
+      {selectedMaterial && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-4 max-h-[80vh] overflow-y-auto relative">
+            <button
+              onClick={() => setSelectedMaterial(null)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800"
+            >
+              <X size={18} />
+            </button>
+            <div className="flex items-center gap-2">
+              <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                {selectedMaterial.subject}
+              </span>
+              <span className="text-xs text-slate-500">{selectedMaterial.createdAt}</span>
+            </div>
+            <h2 className="text-xl font-bold text-white">{selectedMaterial.title}</h2>
+            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800/80 text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
+              {selectedMaterial.content}
+            </div>
+          </div>
+        </div>
+      )}
 
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
@@ -220,4 +253,3 @@ export function App() {
     </div>
   );
 }
-
