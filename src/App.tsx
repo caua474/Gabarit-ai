@@ -1,3 +1,5 @@
+const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
+import { UpgradeModal } from './components/UpgradeModal';
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { OfflineStatusBanner } from './components/OfflineStatusBanner';
