@@ -1,711 +1,601 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { AnimatePresence } from 'motion/react';
-import { Header } from './components/Header';
-import { NavigationTabs, AbaAtiva } from './components/NavigationTabs';
-import { BottomNavigationBar, PrimaryTab } from './components/BottomNavigationBar';
-import DashboardPrincipal from './components/DashboardPrincipal';
-import { ArenaX1Section } from './components/ArenaX1Section';
-import ConteudosBentoIA from './components/ConteudosBentoIA';
-import { BibliotecaSection } from './components/BibliotecaSection';
-import { SubjectCatalogSection } from './components/SubjectCatalogSection';
-import { EnemGlossarySection } from './components/EnemGlossarySection';
-import { MindmapGeneratorSection } from './components/MindmapGeneratorSection';
-import { FeynmanAudioSection } from './components/FeynmanAudioSection';
-import { KnowledgePillsSection } from './components/KnowledgePillsSection';
-import { AudioPodcastsSection } from './components/AudioPodcastsSection';
-import { AutoFlashcardsSection } from './components/AutoFlashcardsSection';
-import { QuestionScannerSection } from './components/QuestionScannerSection';
-import RedacaoCorretor from './components/RedacaoCorretor';
-import { C5InterventionDetectorSection } from './components/C5InterventionDetectorSection';
-import { RepertoriosCoringaSection } from './components/RepertoriosCoringaSection';
-import { EssaySkeletonCanvasSection } from './components/EssaySkeletonCanvasSection';
-import { HotEssayRadarSection } from './components/HotEssayRadarSection';
-import { DevilAdvocateSection } from './components/DevilAdvocateSection';
-import Simulados from './components/Simulados';
-import { AdaptiveSimuladoSection } from './components/AdaptiveSimuladoSection';
-import { ReelsQuestionFeedSection } from './components/ReelsQuestionFeedSection';
-import { QuizBattleSection } from './components/QuizBattleSection';
-import { CadernoDeErrosSection } from './components/CadernoDeErrosSection';
-import { OpticalAnswerSheetScannerSection } from './components/OpticalAnswerSheetScannerSection';
-import { TestStrategyGabaritoSection } from './components/TestStrategyGabaritoSection';
-import { ExamAmbientSoundPlayer } from './components/ExamAmbientSoundPlayer';
-import PerfilXP from './components/PerfilXP';
-import { StudyStatisticsSection } from './components/StudyStatisticsSection';
-import { WeeklyRankingSection } from './components/WeeklyRankingSection';
-import { EmergencyFinal30DaysSection } from './components/EmergencyFinal30DaysSection';
-import { WeeklyRoutinePlannerSection } from './components/WeeklyRoutinePlannerSection';
-import { SisuSimulatorSection } from './components/SisuSimulatorSection';
-import { CheatSheetGeneratorSection } from './components/CheatSheetGeneratorSection';
-import { CentralDeOpcoesSection } from './components/CentralDeOpcoesSection';
-import { OfflineStatusBanner } from './components/OfflineStatusBanner';
-import { HomeHubCategories } from './components/HomeHubCategories';
-
-// Modals
-import { ProfileSettingsModal, getSavedUserProfile } from './components/ProfileSettingsModal';
-import { ProSubscriptionModal } from './components/ProSubscriptionModal';
-import { GabiAssistantModal } from './components/GabiAssistantModal';
-import { OnboardingModal } from './components/OnboardingModal';
-import { HistoryModal } from './components/HistoryModal';
-import { HowItWorksModal } from './components/HowItWorksModal';
-import { DailyStudyTipModal } from './components/DailyStudyTipModal';
-import { StudyCalendarModal } from './components/StudyCalendarModal';
-import { BancaPersonalitySelectorModal } from './components/BancaPersonalitySelectorModal';
-import { InteractiveQuizModal } from './components/InteractiveQuizModal';
-import { SocialShareStoryModal } from './components/SocialShareStoryModal';
-import { EnemPrintableSheetModal } from './components/EnemPrintableSheetModal';
-import { MicrophonePermissionModal } from './components/MicrophonePermissionModal';
-import { OpcoesGeraisModal } from './components/OpcoesGeraisModal';
-
-// Utilities & Data
-import { StudyMaterial, TutorPlan, ELI5Explanation, UserProfile } from './types';
-import * as db from './utils/db';
-import { playClickSound, playSuccessSound } from './utils/audio';
+import React, { useState } from 'react';
+import { 
+  Home, Swords, BookOpen, PenTool, Target, User, Search, Bell, 
+  Sparkles, Calendar, Layers, Trophy, Bot, Crown, BarChart2, 
+  X, ChevronRight, Play, CheckCircle2, MessageSquare
+} from 'lucide-react';
 
 export default function App() {
-  // Navigation States
-  const [primaryTab, setPrimaryTab] = useState<PrimaryTab>('home');
-  const [abaAtiva, setAbaAtiva] = useState<AbaAtiva>('flashcards');
+  // Estados de Navegação e Dados
+  const [activeTab, setActiveTab] = useState('home');
+  const [activeTopPill, setActiveTopPill] = useState('bento');
+  const [dailyQuestions, setDailyQuestions] = useState(0);
+  const [isGabiOpen, setIsGabiOpen] = useState(false);
+  const [desiredCourse, setDesiredCourse] = useState('Medicina');
+  const [targetExam, setTargetExam] = useState('ENEM 2026');
+  const [dailyHoursGoal, setDailyHoursGoal] = useState('4h');
+  const [dailyQuestionsGoal, setDailyQuestionsGoal] = useState(20);
 
-  // Theme State
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    try {
-      const saved = localStorage.getItem('gabaritai_theme');
-      if (saved === 'light' || saved === 'dark') return saved;
-    } catch (e) {
-      console.error(e);
-    }
-    return 'dark';
-  });
+  // Mensagens do Chat da Gabi IA
+  const [chatMessages, setChatMessages] = useState([
+    { sender: 'gabi', text: 'Oi! Sou a Gabi IA. Como posso te ajudar nos seus estudos hoje? 🚀' }
+  ]);
+  const [inputMessage, setInputMessage] = useState('');
 
-  // User Gamification & Profile States
-  const [studyStreak, setStudyStreak] = useState<number>(() => {
-    try {
-      const saved = localStorage.getItem('gabaritai_study_streak_v1');
-      if (saved) return parseInt(saved, 10);
-    } catch (e) {
-      console.error(e);
-    }
-    return 7;
-  });
+  const topPills = [
+    { id: 'bento', label: '🍱 Bento AI' },
+    { id: 'banca', label: '🏛️ Banca IA' },
+    { id: 'calendario', label: '📅 Calendário' },
+    { id: 'flashcards', label: '🎴 Flashcards' },
+    { id: 'ranking', label: '🏆 Ranking' },
+    { id: 'professora', label: '🧑‍🏫 Professora IA' },
+    { id: 'pro', label: '💎 Plano PRO' },
+    { id: 'graficos', label: '📈 Gráficos TRI' },
+  ];
 
-  const [userXP, setUserXP] = useState<number>(() => {
-    try {
-      const saved = localStorage.getItem('gabaritai_xp_v1');
-      if (saved) return parseInt(saved, 10);
-    } catch (e) {
-      console.error(e);
-    }
-    return 1250;
-  });
+  const subjects = [
+    { name: 'Matemática', icon: '📐' },
+    { name: 'Biologia', icon: '🧬' },
+    { name: 'Física', icon: '⚡' },
+    { name: 'Química', icon: '🧪' },
+    { name: 'História', icon: '📜' },
+    { name: 'Geografia', icon: '🌍' },
+    { name: 'Filosofia', icon: '🏛️' },
+    { name: 'Sociologia', icon: '👥' },
+  ];
 
-  const [userProfile, setUserProfile] = useState<UserProfile>(() => getSavedUserProfile());
-
-  // IndexedDB Data Cache
-  const [materials, setMaterials] = useState<StudyMaterial[]>([]);
-  const [tutorPlans, setTutorPlans] = useState<TutorPlan[]>([]);
-  const [eli5Explanations, setEli5Explanations] = useState<ELI5Explanation[]>([]);
-
-  // Modal States
-  const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [selectedMaterial, setSelectedMaterial] = useState<StudyMaterial | null>(null);
-  const [socialStoryData, setSocialStoryData] = useState<{
-    type: 'redacao' | 'mascote' | 'streak' | 'quiz';
-    data: any;
-  } | null>(null);
-  const [printSheetTheme, setPrintSheetTheme] = useState<string>('');
-  const [gabiInitialPrompt, setGabiInitialPrompt] = useState<string | null>(null);
-
-  // Sync Theme with DOM
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-    try {
-      localStorage.setItem('gabaritai_theme', theme);
-    } catch (e) {
-      console.error(e);
-    }
-  }, [theme]);
-
-  // Load Saved Materials from IndexedDB
-  const loadDatabaseItems = useCallback(async () => {
-    try {
-      const [mats, plans, eli5s] = await Promise.all([
-        db.getAllMaterials().catch(() => []),
-        db.getAllTutorPlans().catch(() => []),
-        db.getAllELI5Explanations().catch(() => []),
+  const handleSendMessage = () => {
+    if (!inputMessage.trim()) return;
+    setChatMessages(prev => [...prev, { sender: 'user', text: inputMessage }]);
+    const userQ = inputMessage;
+    setInputMessage('');
+    
+    setTimeout(() => {
+      setChatMessages(prev => [
+        ...prev, 
+        { sender: 'gabi', text: `Excelente pergunta sobre "${userQ}"! Vamos revisar os pontos-chave sobre isso focando na TRI do ENEM.` }
       ]);
-      setMaterials(mats);
-      setTutorPlans(plans);
-      setEli5Explanations(eli5s);
-    } catch (e) {
-      console.error('Erro ao carregar banco de dados:', e);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadDatabaseItems();
-  }, [loadDatabaseItems]);
-
-  // Handle XP addition
-  const handleAddXP = (amount: number) => {
-    setUserXP((prev) => {
-      const updated = prev + amount;
-      try {
-        localStorage.setItem('gabaritai_xp_v1', updated.toString());
-      } catch (e) {
-        console.error(e);
-      }
-      return updated;
-    });
-    playSuccessSound();
-  };
-
-  // Toggle Theme Handler
-  const handleToggleTheme = () => {
-    playClickSound();
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
-  };
-
-  // Tab Navigation Handling
-  const handleSelectPrimaryTab = (tab: PrimaryTab) => {
-    playClickSound();
-    setPrimaryTab(tab);
-
-    // Set recommended default subtab for each category
-    if (tab === 'conteudos' && !['flashcards', 'biblioteca', 'catalogo', 'glossario_enem', 'mapas_mentais', 'feynman_audio', 'pilulas_conhecimento', 'audio_podcasts', 'auto_flashcards', 'duvidas'].includes(abaAtiva)) {
-      setAbaAtiva('flashcards');
-    } else if (tab === 'redacao_ia' && !['redacao', 'c5_intervencao', 'repertorio', 'esquema_redacao', 'radar_redacao', 'advogado_diabo'].includes(abaAtiva)) {
-      setAbaAtiva('redacao');
-    } else if (tab === 'simulados_treino' && !['simulado_tri', 'simulado_adaptativo', 'reels_feed', 'desafios', 'caderno_erros', 'corretor_gabarito', 'estratégia_chute', 'som_ambiente'].includes(abaAtiva)) {
-      setAbaAtiva('simulado_tri');
-    } else if (tab === 'perfil_gamificacao' && !['mascote_xp', 'estatisticas_estudo', 'ranking', 'reta_final', 'planner_rotina', 'sisu_simulator', 'folha_vespera'].includes(abaAtiva)) {
-      setAbaAtiva('mascote_xp');
-    } else if (tab === 'arena') {
-      setAbaAtiva('arena_x1');
-    }
+    }, 800);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
-      {/* Offline Status Indicator */}
-      <OfflineStatusBanner />
+    <div className="min-h-screen bg-[#090d16] text-gray-100 font-sans pb-24 select-none">
+      {/* Header Fixo */}
+      <header className="sticky top-0 z-40 bg-[#0d1322]/90 backdrop-blur-md border-b border-[#1b253b] px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30">
+            📖
+          </div>
+          <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            GabaritaAí
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          <button className="p-2 rounded-full hover:bg-[#182238] text-gray-400 hover:text-white transition">
+            <Search size={18} />
+          </button>
+          <button className="p-2 rounded-full hover:bg-[#182238] text-gray-400 hover:text-white transition relative">
+            <Bell size={18} />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-pink-500 rounded-full animate-ping" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-pink-500 rounded-full" />
+          </button>
+          <button 
+            onClick={() => setActiveTab('perfil')}
+            className="w-8 h-8 rounded-full bg-purple-600/30 border border-purple-500/50 flex items-center justify-center text-purple-300 font-semibold text-xs"
+          >
+            <User size={16} />
+          </button>
+        </div>
+      </header>
 
-      {/* Daily Study Tip (Auto-prompts if not seen today) */}
-      <DailyStudyTipModal />
+      {/* Grid de Pílulas do Topo */}
+      <section className="p-4 max-w-lg mx-auto">
+        <div className="grid grid-cols-2 gap-2">
+          {topPills.map((pill) => (
+            <button
+              key={pill.id}
+              onClick={() => setActiveTopPill(pill.id)}
+              className={`py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all border ${
+                activeTopPill === pill.id
+                  ? 'bg-purple-600 border-purple-400 text-white shadow-lg shadow-purple-600/30'
+                  : 'bg-[#121a2d] border-[#1e2a45] text-gray-300 hover:bg-[#18233c]'
+              }`}
+            >
+              <span>{pill.label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
 
-      {/* Application Header */}
-      <Header
-        historyCount={materials.length + tutorPlans.length + eli5Explanations.length}
-        studyStreak={studyStreak}
-        theme={theme}
-        canGoBack={primaryTab !== 'home'}
-        onGoBack={() => setPrimaryTab('home')}
-        onToggleTheme={handleToggleTheme}
-        onOpenHistory={() => setActiveModal('history')}
-        onOpenHelp={() => setActiveModal('how_it_works')}
-        onOpenGabi={() => setActiveModal('gabi')}
-        onOpenPro={() => setActiveModal('pro')}
-        onOpenProfile={() => setActiveModal('profile')}
-        onOpenRanking={() => {
-          setPrimaryTab('perfil_gamificacao');
-          setAbaAtiva('ranking');
-        }}
-        onOpenFlashcards={() => {
-          setPrimaryTab('conteudos');
-          setAbaAtiva('flashcards');
-        }}
-        onOpenCalendar={() => setActiveModal('calendar')}
-        onOpenBanca={() => setActiveModal('banca')}
-        onOpenGraficosTri={() => {
-          setPrimaryTab('simulados_treino');
-          setAbaAtiva('simulado_tri');
-        }}
-        onOpenOnboarding={() => setActiveModal('onboarding')}
-        onOpenOpcoesPage={() => setPrimaryTab('opcoes_hub')}
-        onResetView={() => {
-          setPrimaryTab('home');
-          setAbaAtiva('flashcards');
-        }}
-        materials={materials}
-        tutorPlans={tutorPlans}
-        eli5Explanations={eli5Explanations}
-        onSelectMaterial={(mat) => {
-          setSelectedMaterial(mat);
-          setActiveModal('interactive_quiz');
-        }}
-        onSelectTutorPlan={() => {
-          setPrimaryTab('conteudos');
-          setAbaAtiva('catalogo');
-        }}
-        onSelectELI5={() => {
-          setPrimaryTab('conteudos');
-          setAbaAtiva('duvidas');
-        }}
-      />
+      {/* Conteúdo Central */}
+      <main className="max-w-lg mx-auto px-4 space-y-6">
 
-      {/* Top Feature Sub-Navigation Tabs (Active on specific modules, hidden on home/opcoes to keep home clean) */}
-      {primaryTab !== 'opcoes_hub' && primaryTab !== 'home' && (
-        <NavigationTabs
-          primaryTab={primaryTab}
-          abaAtiva={abaAtiva}
-          setAbaAtiva={setAbaAtiva}
-          onTabChange={(tab) => setAbaAtiva(tab)}
-        />
+        {/* 1. TAB HOME */}
+        {activeTab === 'home' && (
+          <>
+            {/* Meta Diária de Estudos */}
+            <div className="bg-[#111827] border border-[#1f293d] rounded-2xl p-5 shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                  <Target size={14} /> Meta Personalizada
+                </span>
+                <div className="flex gap-2">
+                  <button className="text-[11px] text-gray-400 hover:text-white bg-[#1a2336] px-2.5 py-1 rounded-md border border-[#26334d]">
+                    Ocultar Gráfico
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('perfil')}
+                    className="text-[11px] text-purple-300 hover:text-purple-200 bg-[#1a2336] px-2.5 py-1 rounded-md border border-[#26334d]"
+                  >
+                    Editar Meta
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-center my-4">
+                <h2 className="text-lg font-bold text-white">Meta Diária de Estudos</h2>
+                <p className="text-xs text-purple-300 font-semibold mt-1">
+                  {dailyQuestions} de {dailyQuestionsGoal} Questões
+                </p>
+                <p className="text-[11px] text-gray-400 mt-0.5">
+                  Faltam {Math.max(0, dailyQuestionsGoal - dailyQuestions)} questões para completar sua meta diária!
+                </p>
+
+                <div className="flex justify-center gap-2 mt-4">
+                  <button 
+                    onClick={() => setDailyQuestions(prev => prev + 1)}
+                    className="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-lg shadow-purple-600/20"
+                  >
+                    + +1 Questão
+                  </button>
+                  <button 
+                    onClick={() => setDailyQuestions(prev => prev + 5)}
+                    className="bg-[#1c263c] hover:bg-[#253350] text-gray-200 text-xs font-bold px-3.5 py-2 rounded-xl border border-[#2b3a58] transition"
+                  >
+                    + +5 Questões
+                  </button>
+                  <button 
+                    onClick={() => setDailyQuestions(0)}
+                    className="bg-[#1c263c] hover:bg-[#253350] text-gray-300 text-xs font-bold px-3.5 py-2 rounded-xl border border-[#2b3a58] transition"
+                  >
+                    ✏️ Personalizar
+                  </button>
+                </div>
+              </div>
+
+              {/* Anel de Progresso Circular */}
+              <div className="flex flex-col items-center justify-center my-6">
+                <div className="relative w-28 h-28 flex items-center justify-center">
+                  <svg className="w-full h-full transform -rotate-90">
+                    <circle cx="56" cy="56" r="46" stroke="#1f293d" strokeWidth="10" fill="transparent" />
+                    <circle 
+                      cx="56" cy="56" r="46" 
+                      stroke="#8b5cf6" 
+                      strokeWidth="10" 
+                      fill="transparent" 
+                      strokeDasharray={289}
+                      strokeDashoffset={289 - (289 * Math.min(100, (dailyQuestions / dailyQuestionsGoal) * 100)) / 100}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute text-center">
+                    <span className="text-xl font-extrabold text-white">
+                      {Math.round(Math.min(100, (dailyQuestions / dailyQuestionsGoal) * 100))}%
+                    </span>
+                    <span className="block text-[9px] uppercase tracking-widest text-gray-400 font-bold">Progresso</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Gráfico dos 7 Dias */}
+              <div className="border-t border-[#1b253b] pt-4 mt-2">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-gray-300 flex items-center gap-1.5">
+                    <BarChart2 size={14} className="text-emerald-400" /> PROGRESSO DOS ÚLTIMOS 7 DIAS
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-gray-400 mb-4">
+                  <span className="text-emerald-400 font-medium">🔥 3 de 7 metas batidas</span>
+                  <span>📊 Total: 99 questões</span>
+                </div>
+
+                {/* Barras do Gráfico */}
+                <div className="flex items-end justify-between h-28 gap-2 pt-2 px-1">
+                  {[
+                    { day: 'Sáb', val: 26, status: 'hit' },
+                    { day: 'Dom', val: 14, status: 'progress' },
+                    { day: 'Seg', val: 20, status: 'hit' },
+                    { day: 'Ter', val: 5, status: 'progress' },
+                    { day: 'Qua', val: 20, status: 'hit' },
+                    { day: 'Qui', val: 14, status: 'progress' },
+                    { day: 'Hoje', val: dailyQuestions, status: dailyQuestions >= dailyQuestionsGoal ? 'hit' : 'progress' },
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+                      <div 
+                        style={{ height: `${Math.max(10, Math.min(100, (item.val / 28) * 100))}%` }}
+                        className={`w-full rounded-t-md transition-all duration-300 ${
+                          item.status === 'hit' 
+                            ? 'bg-emerald-500 shadow-lg shadow-emerald-500/20' 
+                            : 'bg-indigo-600'
+                        }`}
+                      />
+                      <span className="text-[10px] text-gray-400 font-medium">{item.day}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between text-[10px] text-gray-400 mt-4 border-t border-[#1b253b] pt-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" /> Meta Batida
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-indigo-600" /> Em Progresso
+                  </div>
+                  <span className="text-purple-400 font-semibold">43% de taxa</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Raio-X de Atividade por Disciplina */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-amber-400 flex items-center gap-1.5">
+                  🎯 Raio-X de Atividade por Disciplina
+                </h3>
+                <span className="text-[10px] text-gray-400">Histórico no Navegador</span>
+              </div>
+
+              <div className="space-y-2">
+                {subjects.map((sub, i) => (
+                  <div 
+                    key={i} 
+                    onClick={() => setActiveTab('conteudos')}
+                    className="bg-[#111827] border border-[#1f293d] rounded-xl p-3.5 flex items-center justify-between hover:border-purple-500/40 transition cursor-pointer"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">{sub.icon}</span>
+                        <span className="text-xs font-bold text-white">{sub.name}</span>
+                      </div>
+                      <p className="text-[10px] text-amber-400/90 font-medium mt-1">
+                        Iniciar primeiro treino
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="bg-[#1c263c] text-gray-300 text-[10px] font-semibold px-2 py-0.5 rounded-md border border-[#2b3a58]">
+                        Novo
+                      </span>
+                      <ChevronRight size={14} className="text-gray-500" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* 2. TAB ARENA */}
+        {activeTab === 'arena' && (
+          <div className="space-y-4">
+            <div className="bg-gradient-to-br from-indigo-900/60 to-purple-900/40 border border-indigo-500/30 rounded-2xl p-5 shadow-xl">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-purple-300 flex items-center gap-1">
+                  ⚔️ Arena X1 <span className="bg-red-500/20 text-red-400 text-[9px] px-1.5 py-0.5 rounded uppercase font-extrabold ml-1">AO VIVO</span>
+                </span>
+              </div>
+              <p className="text-xs text-gray-300">
+                Duelos e quizzes competitivos em tempo real entre vestibulandos de todo o Brasil.
+              </p>
+
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                <div className="bg-[#0b101d]/80 p-3 rounded-xl border border-[#1d2840]">
+                  <span className="text-[10px] text-gray-400 font-bold block uppercase">Patente</span>
+                  <span className="text-xs font-bold text-amber-400 mt-0.5 block">👑 Bixo Federal</span>
+                </div>
+                <div className="bg-[#0b101d]/80 p-3 rounded-xl border border-[#1d2840]">
+                  <span className="text-[10px] text-gray-400 font-bold block uppercase">Vitórias</span>
+                  <span className="text-xs font-bold text-emerald-400 mt-0.5 block">🏆 28V / 100</span>
+                </div>
+                <div className="bg-[#0b101d]/80 p-3 rounded-xl border border-[#1d2840]">
+                  <span className="text-[10px] text-gray-400 font-bold block uppercase">Streak</span>
+                  <span className="text-xs font-bold text-orange-400 mt-0.5 block">🔥 7 Seguidas</span>
+                </div>
+                <div className="bg-[#0b101d]/80 p-3 rounded-xl border border-[#1d2840]">
+                  <span className="text-[10px] text-gray-400 font-bold block uppercase">Saldo XP</span>
+                  <span className="text-xs font-bold text-purple-400 mt-0.5 block">⚡ 4000 XP</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-[#111827] border border-[#1f293d] rounded-2xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <Swords size={16} className="text-purple-400" /> Desafio 1v1 com Amigos
+                </h4>
+                <span className="text-[10px] bg-indigo-500/20 text-indigo-300 font-bold px-2 py-0.5 rounded border border-indigo-500/30">
+                  SALA PRIVADA
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 mb-4">
+                Crie uma sala exclusiva e envie o link no WhatsApp para disputar quem gabarita mais rápido.
+              </p>
+              <button className="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2">
+                🔗 Criar Desafio
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 3. TAB CONTEÚDOS */}
+        {activeTab === 'conteudos' && (
+          <div className="space-y-4">
+            <div className="bg-[#111827] border border-[#1f293d] rounded-2xl p-4">
+              <h3 className="text-xs font-bold text-amber-400 flex items-center gap-1.5 mb-1">
+                🍱 Bento IA - Gerador de Estudos
+              </h3>
+              <p className="text-[11px] text-gray-400 mb-3">
+                Digite um assunto para gerar resumos, pontos-chave e flashcards instantâneos.
+              </p>
+
+              <div className="space-y-3">
+                <input 
+                  type="text" 
+                  placeholder="Ex: Ecologia, Geometria Plana, Termoquímica..." 
+                  className="w-full bg-[#0b101d] border border-[#1f293d] rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500 placeholder-gray-500"
+                />
+                <button className="w-full bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-lg shadow-amber-600/20">
+                  ✨ Gerar Kit de Estudos com Bento IA
+                </button>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-[#1b253b]">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">
+                  🔥 MAIS COBRADOS NO ENEM
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {['+ Ecologia', '+ Geometria Plana', '+ Termoquímica', '+ Brasil Colônia', '+ Estatística', '+ Funções'].map((tag, idx) => (
+                    <button key={idx} className="bg-[#1c263c] text-gray-300 text-[10px] font-semibold px-2.5 py-1 rounded-lg border border-[#2b3a58] hover:border-purple-500">
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 4. TAB REDAÇÃO */}
+        {activeTab === 'redacao' && (
+          <div className="space-y-4">
+            <div className="bg-[#111827] border border-[#1f293d] rounded-2xl p-4">
+              <h3 className="text-xs font-bold text-amber-400 flex items-center gap-1.5 mb-1">
+                ✍️ Corretor de Redação
+              </h3>
+              <p className="text-[11px] text-gray-400 mb-3">
+                Análise focada na Competência 5 do ENEM (0 a 200 pontos)
+              </p>
+
+              <textarea 
+                rows={5}
+                placeholder="Cole seu texto ou proposta de intervenção aqui..."
+                className="w-full bg-[#0b101d] border border-[#1f293d] rounded-xl p-3 text-xs text-white focus:outline-none focus:border-purple-500 placeholder-gray-500 resize-none"
+              />
+
+              <button className="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-lg shadow-purple-600/30 mt-3">
+                🤖 Avaliar Competência 5
+              </button>
+
+              <div className="mt-4 pt-3 border-t border-[#1b253b]">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[11px] font-bold text-gray-300">Elementos da C5:</span>
+                  <span className="text-[10px] text-gray-400">40 pontos cada</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {['1. Agente (Quem?)', '2. Ação (O que?)', '3. Modo (Como?)', '4. Efeito (Para quê?)', '5. Detalhamento'].map((elem, i) => (
+                    <div key={i} className={`bg-[#0b101d] p-2 rounded-lg border border-[#1f293d] text-[10px] text-gray-300 ${i === 4 ? 'col-span-2' : ''}`}>
+                      {elem}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 5. TAB SIMULADOS */}
+        {activeTab === 'simulados' && (
+          <div className="space-y-4">
+            {[
+              { title: 'ENEM 2025 - Dia 1', status: 'Disponível', time: '330 min', desc: '90 questões • Linguagens, Humanas + Redação' },
+              { title: 'ENEM 2025 - Dia 2', status: 'Disponível', time: '300 min', desc: '90 questões • Matemática e Natureza' },
+              { title: 'Simulado Inédito - Exatas', status: 'Recomendado', time: '150 min', desc: '45 questões • Focadas na TRI' },
+            ].map((sim, i) => (
+              <div key={i} className="bg-[#111827] border border-[#1f293d] rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <h4 className="text-xs font-bold text-white">{sim.title}</h4>
+                  <span className="bg-purple-500/20 text-purple-300 text-[10px] font-bold px-2 py-0.5 rounded border border-purple-500/30">
+                    {sim.status}
+                  </span>
+                </div>
+                <p className="text-[11px] text-gray-400 mb-3">{sim.desc}</p>
+                <button className="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2 rounded-xl transition shadow-lg shadow-purple-600/30 flex items-center justify-center gap-1">
+                  <Play size={12} /> Iniciar
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 6. TAB PERFIL */}
+        {activeTab === 'perfil' && (
+          <div className="space-y-4">
+            <div className="bg-[#111827] border border-[#1f293d] rounded-2xl p-5 text-center">
+              <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 p-0.5 shadow-lg">
+                <div className="w-full h-full bg-[#0d1322] rounded-[14px] flex items-center justify-center text-2xl">
+                  🎓
+                </div>
+              </div>
+              <h3 className="text-sm font-bold text-white">Estudante GabaritaAí</h3>
+              <p className="text-[11px] text-purple-300 font-medium">Nível 10 - Mestre dos Simulados</p>
+
+              <div className="flex justify-center gap-2 mt-3">
+                <span className="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-amber-500/20">
+                  🎗️ Bixo Federal
+                </span>
+                <span className="bg-orange-500/10 text-orange-400 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-orange-500/20">
+                  🔥 7 dias seguidos
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-[#111827] border border-[#1f293d] rounded-2xl p-4 space-y-3">
+              <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">
+                🎓 META ACADÊMICA
+              </span>
+
+              <div>
+                <label className="text-[11px] text-gray-400 font-medium block mb-1">Curso Desejado:</label>
+                <select 
+                  value={desiredCourse} 
+                  onChange={(e) => setDesiredCourse(e.target.value)}
+                  className="w-full bg-[#0b101d] border border-[#1f293d] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"
+                >
+                  <option value="Medicina">Medicina</option>
+                  <option value="Direito">Direito</option>
+                  <option value="Engenharia de Software">Engenharia de Software</option>
+                  <option value="Psicologia">Psicologia</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[11px] text-gray-400 font-medium block mb-1">Foco Principal:</label>
+                <select 
+                  value={targetExam} 
+                  onChange={(e) => setTargetExam(e.target.value)}
+                  className="w-full bg-[#0b101d] border border-[#1f293d] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"
+                >
+                  <option value="ENEM 2026">ENEM 2026</option>
+                  <option value="FUVEST 2026">FUVEST 2026</option>
+                  <option value="UNICAMP 2026">UNICAMP 2026</option>
+                </select>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-gray-400 font-medium">Meta Diária de Questões:</span>
+                  <span className="text-amber-400 font-bold">{dailyQuestionsGoal} questões</span>
+                </div>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {[10, 20, 30, 50, 100].map((q) => (
+                    <button 
+                      key={q}
+                      onClick={() => setDailyQuestionsGoal(q)}
+                      className={`py-1.5 text-xs font-bold rounded-lg border transition ${
+                        dailyQuestionsGoal === q 
+                          ? 'bg-amber-500 border-amber-400 text-slate-950' 
+                          : 'bg-[#0b101d] border-[#1f293d] text-gray-400'
+                      }`}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Botão Flutuante Gabi IA */}
+      <button 
+        onClick={() => setIsGabiOpen(!isGabiOpen)}
+        className="fixed bottom-20 right-4 z-40 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs px-4 py-2.5 rounded-full shadow-2xl shadow-purple-600/50 flex items-center gap-2 transition transform active:scale-95 border border-purple-400/30"
+      >
+        <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse" />
+        <span>🟢 Gabi IA</span>
+      </button>
+
+      {/* Modal Chat Gabi IA */}
+      {isGabiOpen && (
+        <div className="fixed inset-x-4 bottom-24 max-w-lg mx-auto z-50 bg-[#0d1322] border border-purple-500/40 rounded-2xl p-4 shadow-2xl backdrop-blur-xl">
+          <div className="flex items-center justify-between border-b border-[#1b253b] pb-3 mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center text-xs">
+                🤖
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-white">Gabi IA</h4>
+                <p className="text-[9px] text-emerald-400 font-semibold">Online e pronta para responder</p>
+              </div>
+            </div>
+            <button onClick={() => setIsGabiOpen(false)} className="text-gray-400 hover:text-white">
+              <X size={16} />
+            </button>
+          </div>
+
+          <div className="bg-[#070a12] rounded-xl p-3 h-48 overflow-y-auto mb-3 text-xs text-gray-300 space-y-2 border border-[#1b253b]">
+            {chatMessages.map((msg, idx) => (
+              <div 
+                key={idx} 
+                className={`p-2.5 rounded-xl max-w-[85%] ${
+                  msg.sender === 'user' 
+                    ? 'bg-purple-600 text-white ml-auto' 
+                    : 'bg-[#131c30] text-gray-200'
+                }`}
+              >
+                {msg.text}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-2">
+            <input 
+              type="text" 
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              placeholder="Digite sua dúvida..." 
+              className="flex-1 bg-[#070a12] border border-[#1b253b] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"
+            />
+            <button 
+              onClick={handleSendMessage}
+              className="bg-purple-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-purple-500"
+            >
+              Enviar
+            </button>
+          </div>
+        </div>
       )}
 
-      {/* Main Content Area */}
-      <div id="tab-content-area" className="flex-1 w-full">
-        {/* 1. HOME TAB */}
-        {primaryTab === 'home' && (
-          <DashboardPrincipal
-            onOpenGabi={() => setActiveModal('gabi')}
-            onSelectDisciplina={(materia) => {
-              setPrimaryTab('conteudos');
-              setAbaAtiva('biblioteca');
-            }}
-            onNavigateTab={(tab) => {
-              if (tab === 'arena_x1') {
-                setPrimaryTab('arena');
-                setAbaAtiva('arena_x1');
-              } else if (['flashcards', 'biblioteca', 'catalogo', 'glossario_enem', 'mapas_mentais', 'feynman_audio', 'pilulas_conhecimento', 'audio_podcasts', 'auto_flashcards', 'duvidas'].includes(tab)) {
-                setPrimaryTab('conteudos');
-                setAbaAtiva(tab as any);
-              } else if (['redacao', 'c5_intervencao', 'repertorio', 'esquema_redacao', 'radar_redacao', 'advogado_diabo'].includes(tab)) {
-                setPrimaryTab('redacao_ia');
-                setAbaAtiva(tab as any);
-              } else if (['simulado_tri', 'simulado_adaptativo', 'reels_feed', 'desafios', 'caderno_erros', 'corretor_gabarito', 'estratégia_chute', 'som_ambiente'].includes(tab)) {
-                setPrimaryTab('simulados_treino');
-                setAbaAtiva(tab as any);
-              } else if (['mascote_xp', 'estatisticas_estudo', 'ranking', 'reta_final', 'planner_rotina', 'sisu_simulator', 'folha_vespera'].includes(tab)) {
-                setPrimaryTab('perfil_gamificacao');
-                setAbaAtiva(tab as any);
-              } else {
-                setAbaAtiva(tab as any);
-              }
-            }}
-          >
-            <div className="max-w-7xl mx-auto px-4 pb-20">
-              {/* Organized Category Cards & Quick Access Hub */}
-              <HomeHubCategories
-                onNavigate={(targetPrimary, targetSub) => {
-                  setPrimaryTab(targetPrimary);
-                  setAbaAtiva(targetSub);
-                }}
-              />
-            </div>
-          </DashboardPrincipal>
-        )}
-
-        {/* 2. ARENA TAB */}
-        {primaryTab === 'arena' && (
-          <main className="max-w-7xl mx-auto px-4 pb-28 pt-2">
-            <ArenaX1Section onAddXP={handleAddXP} />
-          </main>
-        )}
-
-        {/* 3. CONTEÚDOS TAB */}
-        {primaryTab === 'conteudos' && (
-          <main className="max-w-7xl mx-auto px-4 pb-28 pt-2">
-            {abaAtiva === 'flashcards' && <ConteudosBentoIA />}
-            {abaAtiva === 'biblioteca' && (
-              <BibliotecaSection
-                onAskGabi={(prompt) => {
-                  setGabiInitialPrompt(prompt);
-                  setActiveModal('gabi');
-                }}
-                onOpenMindmapTab={() => setAbaAtiva('mapas_mentais')}
-              />
-            )}
-            {abaAtiva === 'catalogo' && (
-              <SubjectCatalogSection
-                onSelectTopicAction={(materia, topicoNome, acao) => {
-                  if (acao === 'flashcard') {
-                    setAbaAtiva('flashcards');
-                  } else if (acao === 'duvida') {
-                    setAbaAtiva('duvidas');
-                  } else {
-                    setPrimaryTab('simulados_treino');
-                    setAbaAtiva('simulado_tri');
-                  }
-                }}
-              />
-            )}
-            {abaAtiva === 'glossario_enem' && <EnemGlossarySection />}
-            {abaAtiva === 'mapas_mentais' && (
-              <MindmapGeneratorSection
-                onStudyTopic={() => {
-                  setAbaAtiva('biblioteca');
-                }}
-              />
-            )}
-            {abaAtiva === 'feynman_audio' && <FeynmanAudioSection />}
-            {abaAtiva === 'pilulas_conhecimento' && <KnowledgePillsSection />}
-            {abaAtiva === 'audio_podcasts' && <AudioPodcastsSection />}
-            {abaAtiva === 'auto_flashcards' && <AutoFlashcardsSection onAddXp={handleAddXP} />}
-            {abaAtiva === 'duvidas' && <QuestionScannerSection />}
-            {![
-              'flashcards',
-              'biblioteca',
-              'catalogo',
-              'glossario_enem',
-              'mapas_mentais',
-              'feynman_audio',
-              'pilulas_conhecimento',
-              'audio_podcasts',
-              'auto_flashcards',
-              'duvidas',
-            ].includes(abaAtiva) && <ConteudosBentoIA />}
-          </main>
-        )}
-
-        {/* 4. REDAÇÃO & IA TAB */}
-        {primaryTab === 'redacao_ia' && (
-          <main className="max-w-7xl mx-auto px-4 pb-28 pt-2">
-            {abaAtiva === 'redacao' && <RedacaoCorretor />}
-            {abaAtiva === 'c5_intervencao' && <C5InterventionDetectorSection />}
-            {abaAtiva === 'repertorio' && <RepertoriosCoringaSection />}
-            {abaAtiva === 'esquema_redacao' && (
-              <EssaySkeletonCanvasSection
-                onSendToAnalyzer={(skeleton) => {
-                  setAbaAtiva('redacao');
-                }}
-              />
-            )}
-            {abaAtiva === 'radar_redacao' && <HotEssayRadarSection />}
-            {abaAtiva === 'advogado_diabo' && <DevilAdvocateSection />}
-            {![
-              'redacao',
-              'c5_intervencao',
-              'repertorio',
-              'esquema_redacao',
-              'radar_redacao',
-              'advogado_diabo',
-            ].includes(abaAtiva) && <RedacaoCorretor />}
-          </main>
-        )}
-
-        {/* 5. SIMULADOS & TREINO TAB */}
-        {primaryTab === 'simulados_treino' && (
-          <main className="max-w-7xl mx-auto px-4 pb-28 pt-2">
-            {abaAtiva === 'simulado_tri' && <Simulados />}
-            {abaAtiva === 'simulado_adaptativo' && <AdaptiveSimuladoSection onAddXp={handleAddXP} />}
-            {abaAtiva === 'reels_feed' && <ReelsQuestionFeedSection onAddXp={handleAddXP} />}
-            {abaAtiva === 'desafios' && <QuizBattleSection onAddXP={handleAddXP} />}
-            {abaAtiva === 'caderno_erros' && <CadernoDeErrosSection onAddXp={handleAddXP} />}
-            {abaAtiva === 'corretor_gabarito' && <OpticalAnswerSheetScannerSection />}
-            {abaAtiva === 'estratégia_chute' && <TestStrategyGabaritoSection />}
-            {abaAtiva === 'som_ambiente' && <ExamAmbientSoundPlayer />}
-            {![
-              'simulado_tri',
-              'simulado_adaptativo',
-              'reels_feed',
-              'desafios',
-              'caderno_erros',
-              'corretor_gabarito',
-              'estratégia_chute',
-              'som_ambiente',
-            ].includes(abaAtiva) && <Simulados />}
-          </main>
-        )}
-
-        {/* 6. PERFIL & GAMIFICAÇÃO TAB */}
-        {primaryTab === 'perfil_gamificacao' && (
-          <main className="max-w-7xl mx-auto px-4 pb-28 pt-2">
-            {abaAtiva === 'mascote_xp' && (
-              <PerfilXP
-                userName={userProfile?.name || 'Estudante ENEM'}
-                userXP={userXP}
-                level={Math.min(10, Math.floor(userXP / 350) + 1)}
-                levelTitle="Mestre dos Simulados"
-                streakDays={studyStreak || 7}
-                onOpenSettings={() => setActiveModal('profile')}
-              />
-            )}
-            {abaAtiva === 'estatisticas_estudo' && <StudyStatisticsSection />}
-            {abaAtiva === 'ranking' && (
-              <WeeklyRankingSection
-                onStudyClick={() => {
-                  setPrimaryTab('conteudos');
-                  setAbaAtiva('flashcards');
-                }}
-              />
-            )}
-            {abaAtiva === 'reta_final' && <EmergencyFinal30DaysSection />}
-            {abaAtiva === 'planner_rotina' && <WeeklyRoutinePlannerSection />}
-            {abaAtiva === 'sisu_simulator' && (
-              <SisuSimulatorSection
-                onGoToStudy={() => {
-                  setPrimaryTab('conteudos');
-                  setAbaAtiva('biblioteca');
-                }}
-              />
-            )}
-            {abaAtiva === 'folha_vespera' && <CheatSheetGeneratorSection />}
-            {![
-              'mascote_xp',
-              'estatisticas_estudo',
-              'ranking',
-              'reta_final',
-              'planner_rotina',
-              'sisu_simulator',
-              'folha_vespera',
-            ].includes(abaAtiva) && (
-              <PerfilXP
-                userName={userProfile?.name || 'Estudante ENEM'}
-                userXP={userXP}
-                level={Math.min(10, Math.floor(userXP / 350) + 1)}
-                levelTitle="Mestre dos Simulados"
-                streakDays={studyStreak || 7}
-                onOpenSettings={() => setActiveModal('profile')}
-              />
-            )}
-          </main>
-        )}
-
-        {/* 7. OPÇÕES GERAIS / HUB */}
-        {primaryTab === 'opcoes_hub' && (
-          <CentralDeOpcoesSection
-            userProfile={userProfile}
-            studyStreak={studyStreak}
-            historyCount={materials.length + tutorPlans.length + eli5Explanations.length}
-            theme={theme}
-            onToggleTheme={handleToggleTheme}
-            onOpenProfile={() => setActiveModal('profile')}
-            onOpenHistory={() => setActiveModal('history')}
-            onOpenHelp={() => setActiveModal('how_it_works')}
-            onOpenOnboarding={() => setActiveModal('onboarding')}
-            onOpenGabi={() => setActiveModal('gabi')}
-            onOpenPro={() => setActiveModal('pro')}
-            onGoHome={() => setPrimaryTab('home')}
-          />
-        )}
-      </div>
-
-      {/* Bottom Navigation Bar */}
-      <BottomNavigationBar
-        activePrimaryTab={primaryTab}
-        onSelectPrimaryTab={handleSelectPrimaryTab}
-      />
-
-      {/* Modals & Overlays */}
-      <AnimatePresence>
-        {/* Profile Settings Modal */}
-        {activeModal === 'profile' && (
-          <ProfileSettingsModal
-            studyStreak={studyStreak}
-            theme={theme}
-            onToggleTheme={handleToggleTheme}
-            onOpenOnboarding={() => setActiveModal('onboarding')}
-            onClose={() => setActiveModal(null)}
-          />
-        )}
-
-        {/* PRO Subscription Modal */}
-        {activeModal === 'pro' && (
-          <ProSubscriptionModal onClose={() => setActiveModal(null)} />
-        )}
-
-        {/* Professora Gabi AI Assistant Modal */}
-        {activeModal === 'gabi' && (
-          <GabiAssistantModal
-            initialPrompt={gabiInitialPrompt}
-            onNavigateShortcut={(atalho) => {
-              if (atalho === 'arena') {
-                setPrimaryTab('arena');
-              } else if (atalho === 'redacao') {
-                setPrimaryTab('redacao_ia');
-              } else if (atalho === 'simulados') {
-                setPrimaryTab('simulados_treino');
-              } else if (atalho === 'pro') {
-                setActiveModal('pro');
-                return;
-              }
-              setActiveModal(null);
-            }}
-            onClose={() => {
-              setActiveModal(null);
-              setGabiInitialPrompt(null);
-            }}
-          />
-        )}
-
-        {/* Onboarding Tutorial Modal */}
-        {activeModal === 'onboarding' && (
-          <OnboardingModal
-            onSaveProfile={(updatedProfile) => {
-              setUserProfile(updatedProfile);
-            }}
-            onOpenProfile={() => setActiveModal('profile')}
-            onClose={() => setActiveModal(null)}
-          />
-        )}
-
-        {/* History Modal */}
-        {activeModal === 'history' && (
-          <HistoryModal
-            materials={materials}
-            tutorPlans={tutorPlans}
-            eli5Explanations={eli5Explanations}
-            onSelectMaterial={(mat) => {
-              setSelectedMaterial(mat);
-              setActiveModal('interactive_quiz');
-            }}
-            onSelectTutorPlan={() => {
-              setPrimaryTab('conteudos');
-              setAbaAtiva('catalogo');
-              setActiveModal(null);
-            }}
-            onSelectELI5={() => {
-              setPrimaryTab('conteudos');
-              setAbaAtiva('duvidas');
-              setActiveModal(null);
-            }}
-            onDeleteMaterial={async (id) => {
-              await db.deleteMaterial(id);
-              setMaterials((prev) => prev.filter((m) => m.id !== id));
-            }}
-            onDeleteTutorPlan={async (id) => {
-              await db.deleteTutorPlan(id);
-              setTutorPlans((prev) => prev.filter((p) => p.id !== id));
-            }}
-            onDeleteELI5={async (id) => {
-              await db.deleteELI5Explanation(id);
-              setEli5Explanations((prev) => prev.filter((e) => e.id !== id));
-            }}
-            onClearHistory={async (cat) => {
-              if (cat === 'all') {
-                await db.clearEntireDatabase();
-                setMaterials([]);
-                setTutorPlans([]);
-                setEli5Explanations([]);
-              } else if (cat === 'materials') {
-                await db.clearAllMaterials();
-                setMaterials([]);
-              } else if (cat === 'tutor') {
-                await db.clearAllTutorPlans();
-                setTutorPlans([]);
-              } else if (cat === 'eli5') {
-                await db.clearAllELI5Explanations();
-                setEli5Explanations([]);
-              }
-            }}
-            onClose={() => setActiveModal(null)}
-          />
-        )}
-
-        {/* How It Works Tutorial Modal */}
-        {activeModal === 'how_it_works' && (
-          <HowItWorksModal
-            onNavigateModule={(tab, sub) => {
-              if (tab) setPrimaryTab(tab as any);
-              if (sub) setAbaAtiva(sub as any);
-              setActiveModal(null);
-            }}
-            onClose={() => setActiveModal(null)}
-          />
-        )}
-
-        {/* Study Streak Calendar Modal */}
-        {activeModal === 'calendar' && (
-          <StudyCalendarModal
-            studyStreak={studyStreak}
-            onUpdateStreak={(newStreak) => setStudyStreak(newStreak)}
-            onClose={() => setActiveModal(null)}
-          />
-        )}
-
-        {/* Banca Personality Selector Modal */}
-        {activeModal === 'banca' && (
-          <BancaPersonalitySelectorModal
-            isOpen={true}
-            onClose={() => setActiveModal(null)}
-          />
-        )}
-
-        {/* General Options Modal */}
-        {activeModal === 'opcoes' && (
-          <OpcoesGeraisModal
-            isOpen={true}
-            historyCount={materials.length + tutorPlans.length + eli5Explanations.length}
-            studyStreak={studyStreak}
-            theme={theme}
-            onToggleTheme={handleToggleTheme}
-            onOpenProfile={() => setActiveModal('profile')}
-            onOpenHistory={() => setActiveModal('history')}
-            onOpenHelp={() => setActiveModal('how_it_works')}
-            onOpenOnboarding={() => setActiveModal('onboarding')}
-            onClose={() => setActiveModal(null)}
-          />
-        )}
-
-        {/* Interactive Quiz Modal */}
-        {activeModal === 'interactive_quiz' && selectedMaterial && (
-          <InteractiveQuizModal
-            material={selectedMaterial}
-            onShare={(score, total, topic) => {
-              setSocialStoryData({
-                type: 'quiz',
-                data: {
-                  quizScore: score,
-                  quizTotal: total,
-                  quizTopic: topic,
-                  quizPercent: Math.round((score / total) * 100),
-                },
-              });
-              setActiveModal('social_story');
-            }}
-            onCompleted={() => {
-              handleAddXP(50);
-            }}
-            onClose={() => {
-              setActiveModal(null);
-              setSelectedMaterial(null);
-            }}
-          />
-        )}
-
-        {/* Social Share Story Modal */}
-        {activeModal === 'social_story' && (
-          <SocialShareStoryModal
-            type={socialStoryData?.type || 'mascote'}
-            data={
-              socialStoryData?.data || {
-                mascotName: 'Gabaritão',
-                streakDays: studyStreak,
-                mascotXp: userXP,
-              }
-            }
-            onClose={() => {
-              setActiveModal(null);
-              setSocialStoryData(null);
-            }}
-          />
-        )}
-
-        {/* Printable ENEM Essay Sheet Modal */}
-        {activeModal === 'printable_sheet' && (
-          <EnemPrintableSheetModal
-            initialTheme={printSheetTheme}
-            onClose={() => {
-              setActiveModal(null);
-              setPrintSheetTheme('');
-            }}
-          />
-        )}
-
-        {/* Microphone Permission Modal */}
-        {activeModal === 'microphone' && (
-          <MicrophonePermissionModal
-            isOpen={true}
-            onAllow={() => setActiveModal(null)}
-            onDisallow={() => setActiveModal(null)}
-          />
-        )}
-      </AnimatePresence>
+      {/* Rodapé Fixo */}
+      <nav className="fixed bottom-0 inset-x-0 z-40 bg-[#0d1322]/95 backdrop-blur-md border-t border-[#1b253b] max-w-lg mx-auto">
+        <div className="grid grid-cols-6 h-16">
+          {[
+            { id: 'home', label: 'Home', icon: Home },
+            { id: 'arena', label: 'Arena ⚔️', icon: Swords },
+            { id: 'conteudos', label: 'Conteúdos', icon: BookOpen },
+            { id: 'redacao', label: 'Redação & IA', icon: PenTool },
+            { id: 'simulados', label: 'Simulados', icon: Target },
+            { id: 'perfil', label: 'Perfil & XP', icon: User },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex flex-col items-center justify-center gap-1 transition ${
+                  isActive ? 'text-purple-400 font-bold' : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                <Icon size={18} className={isActive ? 'stroke-[2.5]' : 'stroke-[1.75]'} />
+                <span className="text-[9px] truncate max-w-full px-0.5">{tab.label}</span>
+                {isActive && <span className="w-1 h-1 bg-purple-400 rounded-full -mt-0.5" />}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
-      }
+}
