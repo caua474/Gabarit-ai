@@ -1,320 +1,150 @@
-import React, { useState, useEffect } from 'react';
-import { Header } from './components/Header';
-import { OfflineStatusBanner } from './components/OfflineStatusBanner';
-import { NavigationTabs } from './components/NavigationTabs';
-import { BentoResults } from './components/BentoResults';
-import { GabiAssistantModal } from './components/GabiAssistantModal';
-import { StudyPlannerModal } from './components/StudyPlannerModal';
-import { AIStudioPlayground } from './components/AIStudioPlayground';
-import { UpgradeModal } from './components/UpgradeModal';
-import { StudyMaterial } from './types';
-import { X, Zap, Trophy, User, Target, BookOpen } from 'lucide-react';
-
-interface StudyPlan {
-  id: string;
-  title: string;
-  duration: number;
-  createdAt: string;
-}
-
-const DEFAULT_MATERIALS: StudyMaterial[] = [
-  {
-    id: '1',
-    title: 'Resumo de Trigonometria Avançada',
-    subject: 'Matemática',
-    content: 'Estudo detalhado sobre seno, cosseno e tangente aplicados a triângulos retângulos e equações circulares.',
-    createdAt: 'Hoje',
-    tags: ['EM', 'ENEM', 'Fórmulas'],
-  },
-  {
-    id: '2',
-    title: 'Introdução à Genética e Mendel',
-    subject: 'Biologia',
-    content: 'Primeira e segunda lei de Mendel, quadros de Punnett e hereditariedade de grupos sanguíneos ABO.',
-    createdAt: 'Ontem',
-    tags: ['Biologia', 'Genética'],
-  },
-];
+import React, { useState } from 'react';
 
 export default function App() {
-  const [activePrimaryTab, setActivePrimaryTab] = useState('materials');
-  const [activeSecondaryTab, setActiveSecondaryTab] = useState('all');
-  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
-  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
-  const [selectedMaterial, setSelectedMaterial] = useState<StudyMaterial | null>(null);
-
-  const [newTitle, setNewTitle] = useState('');
-  const [newSubject, setNewSubject] = useState('');
-  const [newContent, setNewContent] = useState('');
-
-  const [plans, setPlans] = useState<StudyPlan[]>(() => {
-    try {
-      const saved = localStorage.getItem('gabarita_plans');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const [materials, setMaterials] = useState<StudyMaterial[]>(() => {
-    try {
-      const saved = localStorage.getItem('gabarita_materials');
-      return saved ? JSON.parse(saved) : DEFAULT_MATERIALS;
-    } catch {
-      return DEFAULT_MATERIALS;
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem('gabarita_plans', JSON.stringify(plans));
-  }, [plans]);
-
-  useEffect(() => {
-    localStorage.setItem('gabarita_materials', JSON.stringify(materials));
-  }, [materials]);
-
-  const handleTabSelect = (tabId: string) => {
-    setActivePrimaryTab(tabId);
-    if (tabId === 'plans' || tabId === 'planner') {
-      setIsPlannerOpen(true);
-    } else if (tabId === 'tutor' || tabId === 'assistant') {
-      setIsAssistantOpen(true);
-    } else if (tabId === 'profile') {
-      setIsProfileOpen(true);
-    }
-  };
-
-  const handleAddPlan = (newPlan: StudyPlan) => {
-    setPlans((prev) => [newPlan, ...prev]);
-  };
-
-  const handleCreateMaterial = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTitle.trim() || !newSubject.trim()) return;
-
-    const newMat: StudyMaterial = {
-      id: Date.now().toString(),
-      title: newTitle,
-      subject: newSubject,
-      content: newContent || 'Sem conteúdo adicional.',
-      createdAt: 'Hoje',
-      tags: [newSubject],
-    };
-
-    setMaterials((prev) => [newMat, ...prev]);
-    setNewTitle('');
-    setNewSubject('');
-    setNewContent('');
-    setIsCreateModalOpen(false);
-  };
+  const [activeTab, setActiveTab] = useState('materiais');
+  const [selectedCategory, setSelectedCategory] = useState('Todas');
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
-      <OfflineStatusBanner />
-
-      <Header
-        onOpenAssistant={() => setIsAssistantOpen(true)}
-        onOpenPlanner={() => setIsPlannerOpen(true)}
-      />
-
-      <div className="bg-gradient-to-r from-indigo-900/40 via-purple-900/30 to-slate-900 border-b border-indigo-500/20 px-4 py-2.5 flex items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-2 text-indigo-300">
-          <Zap size={15} className="text-amber-400 fill-amber-400 shrink-0" />
-          <span><strong>GabaritaAI Pro:</strong> Perguntas ilimitadas, leitor de imagem e modelo Gemini 1.5 Pro por R$ 5,00/mês.</span>
+    <div className="min-h-screen bg-[#070913] text-slate-100 font-sans p-4 md:p-8 max-w-5xl mx-auto space-y-6">
+      {/* Header */}
+      <header className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-amber-400 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+            ✨
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-bold tracking-tight">Gabarita AI</h1>
+              <span className="bg-amber-400/20 text-amber-300 text-xs font-semibold px-2 py-0.5 rounded border border-amber-400/30">PRO</span>
+            </div>
+            <p className="text-xs text-slate-400">Seu tutor inteligente para exames</p>
+          </div>
         </div>
-        <button
-          onClick={() => setIsUpgradeOpen(true)}
-          className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1 rounded-lg text-xs transition-colors shrink-0 shadow-sm"
-        >
-          Seja PRO R$ 5,00
+        <button className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2 shadow-md">
+          👑 Virar PRO
         </button>
+      </header>
+
+      {/* PRO Offer Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 border border-indigo-500/30 p-6 shadow-xl">
+        <div className="inline-block bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-bold px-3 py-1 rounded-full mb-3">
+          👑 OFERTA ESPECIAL DE LANÇAMENTO
+        </div>
+        <h2 className="text-xl md:text-2xl font-bold mb-2">
+          GabaritaAI Pro: Perguntas ilimitadas, leitor de imagem e modelo Gemini por <span className="text-amber-400 border-b-2 border-amber-400">R$ 5,00/mês</span>
+        </h2>
+        <p className="text-sm text-slate-300 mb-4 max-w-2xl">
+          Turbine sua preparação para o ENEM e vestibulares com respostas instantâneas, leitura de fotos de apostilas e explicações passo a passo sem fila.
+        </p>
+
+        <div className="flex flex-wrap gap-4 text-xs text-slate-300 mb-6">
+          <span className="flex items-center gap-1.5 text-emerald-400">✓ Sem limite diário</span>
+          <span className="flex items-center gap-1.5 text-emerald-400">✓ Leitor OCR de questões</span>
+          <span className="flex items-center gap-1.5 text-emerald-400">✓ Gemini 2.5 Flash</span>
+        </div>
+
+        <button className="w-full sm:w-auto bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-bold px-6 py-3 rounded-xl shadow-lg transition text-center">
+          ✨ Assinar PRO por R$ 5,00/mês
+        </button>
+        <p className="text-xs text-slate-400 mt-2">Cancele quando quiser • Acesso imediato</p>
       </div>
 
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
-        <NavigationTabs
-          activePrimaryTab={activePrimaryTab}
-          setActivePrimaryTab={handleTabSelect}
-          activeSecondaryTab={activeSecondaryTab}
-          setActiveSecondaryTab={setActiveSecondaryTab}
-        />
+      {/* Navigation Tabs */}
+      <nav className="flex gap-2 p-1.5 bg-slate-900/80 rounded-xl border border-slate-800 overflow-x-auto">
+        {[
+          { id: 'materiais', label: 'Materiais', icon: '📚' },
+          { id: 'planos', label: 'Planos de Estudo', icon: '📅' },
+          { id: 'tutor', label: 'Tutor IA', icon: '🤖' },
+          { id: 'aistudio', label: 'AI Studio', icon: '⚙️' },
+          { id: 'perfil', label: 'Perfil & XP', icon: '👤' }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap ${
+              activeTab === tab.id
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+            }`}
+          >
+            <span>{tab.icon}</span>
+            {tab.label}
+          </button>
+        ))}
+      </nav>
 
-        {activePrimaryTab === 'playground' ? (
-          <AIStudioPlayground />
-        ) : (
-          <BentoResults
-            materials={materials}
-            activeSecondaryTab={activeSecondaryTab}
-            onSelectMaterial={(mat: StudyMaterial) => setSelectedMaterial(mat)}
-            onOpenCreateModal={() => setIsCreateModalOpen(true)}
+      {/* Search & Filters */}
+      <div className="space-y-3">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Buscar resumos, fórmulas, tags (#ENEM, #Fórmulas)..."
+            className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3 pl-10 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition"
           />
-        )}
-      </main>
-
-      <GabiAssistantModal
-        isOpen={isAssistantOpen}
-        onClose={() => setIsAssistantOpen(false)}
-        onOpenUpgrade={() => setIsUpgradeOpen(true)}
-      />
-
-      <StudyPlannerModal
-        isOpen={isPlannerOpen}
-        onClose={() => setIsPlannerOpen(false)}
-        onAddPlan={handleAddPlan}
-      />
-
-      <UpgradeModal
-        isOpen={isUpgradeOpen}
-        onClose={() => setIsUpgradeOpen(false)}
-        onSuccess={() => alert('Plano Pro Ativado com sucesso!')}
-      />
-
-      {/* Modal de Perfil & XP */}
-      {isProfileOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-5 relative shadow-2xl">
-            <button
-              onClick={() => setIsProfileOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800"
-            >
-              <X size={18} />
-            </button>
-
-            <div className="text-center space-y-2">
-              <div className="w-16 h-16 bg-indigo-600/20 border border-indigo-500/40 rounded-full flex items-center justify-center mx-auto text-indigo-400">
-                <User size={32} />
-              </div>
-              <h2 className="text-xl font-bold text-white">Seu Perfil de Estudante</h2>
-              <p className="text-xs text-slate-400">Acompanhe seu progresso e pontos de experiência.</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center space-y-1">
-                <Trophy size={20} className="text-amber-400 mx-auto" />
-                <span className="block text-xl font-extrabold text-white">1.250 XP</span>
-                <span className="text-[10px] text-slate-400 uppercase tracking-wider">Pontos Totais</span>
-              </div>
-              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center space-y-1">
-                <Target size={20} className="text-indigo-400 mx-auto" />
-                <span className="block text-xl font-extrabold text-white">Nível 4</span>
-                <span className="text-[10px] text-slate-400 uppercase tracking-wider">Estudante Dedicado</span>
-              </div>
-            </div>
-
-            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
-              <div className="flex justify-between text-xs text-slate-300 font-medium">
-                <span className="flex items-center gap-1.5"><BookOpen size={14} className="text-indigo-400" /> Materiais Salvos</span>
-                <span className="font-bold text-white">{materials.length}</span>
-              </div>
-              <div className="flex justify-between text-xs text-slate-300 font-medium">
-                <span className="flex items-center gap-1.5"><Target size={14} className="text-emerald-400" /> Planos de Estudo</span>
-                <span className="font-bold text-white">{plans.length}</span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setIsProfileOpen(false)}
-              className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors"
-            >
-              Fechar
-            </button>
-          </div>
+          <span className="absolute left-3.5 top-3.5 text-slate-400 text-sm">🔍</span>
         </div>
-      )}
 
-      {selectedMaterial && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-4 max-h-[80vh] overflow-y-auto relative">
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {['Todas', 'Matemática', 'Biologia', 'Física', 'Química', 'Redação', 'História'].map(cat => (
             <button
-              onClick={() => setSelectedMaterial(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800"
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap ${
+                selectedCategory === cat
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200'
+              }`}
             >
-              <X size={18} />
+              {cat}
             </button>
-            <div className="flex items-center gap-2">
-              <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2.5 py-0.5 rounded-full text-xs font-semibold">
-                {selectedMaterial.subject}
+          ))}
+        </div>
+      </div>
+
+      {/* Feed Section */}
+      <section className="space-y-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="font-bold text-lg flex items-center gap-2">
+              <span>📚</span> Feed de Estudos por Disciplina
+            </h3>
+            <p className="text-xs text-slate-400">Resumos didáticos, fórmulas essenciais e tópicos de alta incidência no ENEM</p>
+          </div>
+          <span className="text-xs text-slate-400">6 resumos</span>
+        </div>
+
+        {/* Card: Trigonometria */}
+        <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="bg-indigo-950 text-indigo-300 text-xs font-semibold px-2.5 py-1 rounded-md border border-indigo-800/50">
+              Matemática
+            </span>
+            <div className="flex items-center gap-3 text-xs text-slate-400">
+              <span>⏱️ 6 min</span>
+              <span className="text-amber-400 font-medium">• Essencial</span>
+            </div>
+          </div>
+
+          <h4 className="text-lg font-bold text-white">Trigonometria Avançada</h4>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            Relações fundamentais no círculo trigonométrico, identidades de soma de arcos, transformações e equações aplicadas aos vestibulares.
+          </p>
+
+          <div className="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3 text-xs space-y-1 font-mono text-slate-300">
+            <p className="text-[10px] text-slate-500 uppercase font-sans font-bold tracking-wider mb-1">Fórmulas / Princípios Chave:</p>
+            <p>• sen²(x) + cos²(x) = 1</p>
+            <p>• tg(x) = sen(x) / cos(x)</p>
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            {['#ENEM', '#Fórmulas', '#Trigonometria', '#Geometria'].map(tag => (
+              <span key={tag} className="text-[11px] bg-slate-800/60 text-slate-300 px-2 py-0.5 rounded border border-slate-700/50">
+                {tag}
               </span>
-              <span className="text-xs text-slate-500">{selectedMaterial.createdAt}</span>
-            </div>
-            <h2 className="text-xl font-bold text-white">{selectedMaterial.title}</h2>
-            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800/80 text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
-              {selectedMaterial.content}
-            </div>
+            ))}
           </div>
         </div>
-      )}
-
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4">
-            <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-white">Criar Novo Material de Estudo</h3>
-              <button
-                onClick={() => setIsCreateModalOpen(false)}
-                className="text-slate-400 hover:text-white"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateMaterial} className="space-y-3">
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">Título</label>
-                <input
-                  type="text"
-                  required
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="Ex: Fórmulas de Física - Cinemática"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">Matéria / Disciplina</label>
-                <input
-                  type="text"
-                  required
-                  value={newSubject}
-                  onChange={(e) => setNewSubject(e.target.value)}
-                  placeholder="Ex: Física"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">Conteúdo / Anotações</label>
-                <textarea
-                  rows={4}
-                  value={newContent}
-                  onChange={(e) => setNewContent(e.target.value)}
-                  placeholder="Escreva os tópicos principais ou resumo aqui..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500 resize-none"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold"
-                >
-                  Salvar Material
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      </section>
     </div>
   );
 }
