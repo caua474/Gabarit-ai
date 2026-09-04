@@ -1,361 +1,597 @@
 import React, { useState } from 'react';
+import { 
+  Home, Swords, BookOpen, PenTool, Target, User, Search, Bell, 
+  Sparkles, Calendar, Layers, Trophy, Bot, Crown, BarChart2, 
+  Flame, Plus, Settings, Volume2, Moon, Play, CheckCircle2, 
+  MessageSquare, X, ChevronRight, Zap, RefreshCw, HelpCircle
+} from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
-  const [selectedTool, setSelectedTool] = useState<string | null>(null);
+  const [activeTopPill, setActiveTopPill] = useState('bento');
+  const [dailyQuestions, setDailyQuestions] = useState(0);
   const [isGabiOpen, setIsGabiOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState([
-    { sender: 'gabi', text: 'Olá! Sou a Gabi IA 🤖. Em qual matéria ou questão posso te ajudar hoje?' }
-  ]);
-  const [inputMsg, setInputMsg] = useState('');
+  const [desiredCourse, setDesiredCourse] = useState('Medicina');
+  const [targetExam, setTargetExam] = useState('ENEM 2026');
+  const [dailyHoursGoal, setDailyHoursGoal] = useState('4h');
+  const [dailyQuestionsGoal, setDailyQuestionsGoal] = useState(20);
 
-  const handleSendMessage = () => {
-    if (!inputMsg.trim()) return;
-    setChatMessages(prev => [
-      ...prev,
-      { sender: 'user', text: inputMsg },
-      { sender: 'gabi', text: `Analisando sua dúvida sobre "${inputMsg}"... Aqui está a explicação passo a passo com foco na TRI do ENEM!` }
-    ]);
-    setInputMsg('');
-  };
+  const topPills = [
+    { id: 'bento', label: '🍱 Bento AI', icon: Sparkles },
+    { id: 'banca', label: '🏛️ Banca IA', icon: Bot },
+    { id: 'calendario', label: '📅 Calendário', icon: Calendar },
+    { id: 'flashcards', label: '🎴 Flashcards', icon: Layers },
+    { id: 'ranking', label: '🏆 Ranking', icon: Trophy },
+    { id: 'professora', label: '🧑‍🏫 Professora IA', icon: User },
+    { id: 'pro', label: '💎 Plano PRO', icon: Crown },
+    { id: 'graficos', label: '📈 Gráficos TRI', icon: BarChart2 },
+  ];
 
-  const categories = [
-    {
-      title: '✍️ Redação & IA',
-      tabId: 'redacao',
-      items: [
-        { icon: '🎨', label: 'Corretor de Redação', desc: 'Análise automática das 5 competências do ENEM com nota TRI.' },
-        { icon: '📝', label: 'Esqueleto de Redação', desc: 'Modelos prontos e adaptáveis para qualquer tema.' },
-        { icon: '🔥', label: 'Radar de Redação', desc: 'Apostas e temas mais quentes para este ano.' },
-        { icon: '🔍', label: 'Detector C5 (Intervenção)', desc: 'Validador dos 5 elementos da Proposta de Intervenção.' },
-        { icon: '📖', label: 'Repertórios Coringa', desc: 'Citações e filosofias aplicáveis a múltiplos eixos.' },
-      ],
-    },
-    {
-      title: '📚 Conteúdos & Memória',
-      tabId: 'conteudos',
-      items: [
-        { icon: '⚡', label: 'Resumos & Flashcards', highlight: true, desc: 'Fichamentos rápidos e repetição espaçada.' },
-        { icon: '🧠', label: 'Mapas Mentais', desc: 'Visualização esquemática de conteúdos complexos.' },
-        { icon: '📚', label: 'Biblioteca & Fichamentos', desc: 'Acervo completo organizado por disciplinas.' },
-        { icon: '💡', label: 'Pílulas do Conhecimento', desc: 'Conceitos explicados em até 2 minutos.' },
-        { icon: '📐', label: 'Catálogo do Edital', desc: 'Acompanhamento do que já foi estudado.' },
-        { icon: '📖', label: 'Glossário do Edital', desc: 'Termos técnicos e definições essenciais.' },
-      ],
-    },
-    {
-      title: '📝 Simulados & Estratégia',
-      tabId: 'simulados',
-      items: [
-        { icon: '📜', label: 'Simulado TRI Oficial', desc: 'Provas no formato real com algoritmo de calibração.' },
-        { icon: '🎯', label: 'Simulado Adaptativo IA', desc: 'Questões calibradas no seu nível exato de dificuldade.' },
-        { icon: '📓', label: 'Caderno de Erros', desc: 'Análise detalhada das questões que você errou.' },
-        { icon: '📱', label: 'Feed Reels de Questões', desc: 'Resolução rápida no formato vertical.' },
-        { icon: '🎯', label: 'Chute Consciente & Estratégia', desc: 'Técnicas para maximizar sua nota TRI.' },
-      ],
-    },
-    {
-      title: '⚔️ Arena & Gamificação',
-      tabId: 'arena',
-      items: [
-        { icon: '⚔️', label: 'Arena X1 (Dueling)', desc: 'Desafie outros estudantes em tempo real!' },
-        { icon: '⚔️', label: 'Batalha X1 de Questões', desc: 'Quem acertar mais rápido ganha XP.' },
-        { icon: '🏆', label: 'Ranking Semanal Regional', desc: 'Sua posição em relação aos vestibulandos da sua região.' },
-        { icon: '🐱', label: 'Mascote Gabaritão & XP', desc: 'Evolua seu mascote conforme cumpre metas diárias.' },
-      ],
-    },
-    {
-      title: '🛠️ Ferramentas de Estudo',
-      tabId: 'ferramentas',
-      items: [
-        { icon: '💡', label: 'Scanner Tira-Dúvidas', desc: 'Tire foto da questão para receber a resolução por IA.' },
-        { icon: '🎤', label: 'Teste Verbal Feynman', desc: 'Explique a matéria com suas palavras e receba feedback.' },
-        { icon: '🎧', label: 'Modo Áudio & Podcasts', desc: 'Aulas sintetizadas para ouvir em deslocamentos.' },
-        { icon: '🎴', label: 'Auto-Flashcards (Foto/Texto)', desc: 'Gere flashcards automaticamente a partir de apostilas.' },
-        { icon: '😈', label: 'Advogado do Diabo (Debate)', desc: 'Treine argumentação debatendo teses com a IA.' },
-        { icon: '🎧', label: 'Som Ambiente de Prova', desc: 'Sons binaurais e ruídos brancos para foco extremo.' },
-        { icon: '📊', label: 'Estatísticas de Estudo', desc: 'Análise de métricas de tempo, retenção e acertos.' },
-        { icon: '🚨', label: 'Modo Reta Final (30 Dias)', desc: 'Cronograma intensivo pré-prova.' },
-        { icon: '📅', label: 'Planner & Rotina', desc: 'Organizador semanal inteligente.' },
-        { icon: '🏛️', label: 'Simulador SISU', desc: 'Calcule suas chances com base na nota TRI estimada.' },
-        { icon: '📄', label: 'Folha de Véspera (Cheat Sheet)', desc: 'Resumos super sintetizados para o dia anterior.' },
-      ],
-    },
+  const subjects = [
+    { name: 'Matemática', icon: '📐' },
+    { name: 'Biologia', icon: '🧬' },
+    { name: 'Física', icon: '⚡' },
+    { name: 'Química', icon: '🧪' },
+    { name: 'História', icon: '📜' },
+    { name: 'Geografia', icon: '🌍' },
+    { name: 'Filosofia', icon: '🏛️' },
+    { name: 'Sociologia', icon: '👥' },
   ];
 
   return (
-    <div className="min-h-screen bg-[#070913] text-slate-100 font-sans pb-28 p-3 md:p-6 max-w-4xl mx-auto space-y-5">
-      {/* Header */}
-      <header className="flex items-center justify-between pb-3 border-b border-slate-800/80">
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-amber-400 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-950">
-            ✨
+    <div className="min-h-screen bg-[#090d16] text-gray-100 font-sans pb-24 select-none">
+      {/* Header Fixo Topo */}
+      <header className="sticky top-0 z-40 bg-[#0d1322]/90 backdrop-blur-md border-b border-[#1b253b] px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30">
+            📖
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <h1 className="text-lg font-bold tracking-tight text-white">Gabarita AI</h1>
-              <span className="bg-amber-400/20 text-amber-300 text-[10px] font-extrabold px-2 py-0.5 rounded border border-amber-400/40">
-                PRO
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400">Seu tutor inteligente para exames</p>
-          </div>
+          <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            GabaritaAí
+          </span>
         </div>
-        <button
-          onClick={() => setSelectedTool('Plano PRO')}
-          className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-extrabold px-3.5 py-2 rounded-xl text-xs transition flex items-center gap-1.5 shadow-md shadow-amber-950"
-        >
-          👑 Virar PRO
-        </button>
+        <div className="flex items-center gap-3">
+          <button className="p-2 rounded-full hover:bg-[#182238] text-gray-400 hover:text-white transition">
+            <Search size={18} />
+          </button>
+          <button className="p-2 rounded-full hover:bg-[#182238] text-gray-400 hover:text-white transition relative">
+            <Bell size={18} />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-pink-500 rounded-full animate-ping" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-pink-500 rounded-full" />
+          </button>
+          <button 
+            onClick={() => setActiveTab('perfil')}
+            className="w-8 h-8 rounded-full bg-purple-600/30 border border-purple-500/50 flex items-center justify-center text-purple-300 font-semibold text-xs"
+          >
+            <User size={16} />
+          </button>
+        </div>
       </header>
 
-      {/* Carrossel de Atalhos Rápidos Superior */}
-      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-        <button
-          onClick={() => setSelectedTool('Resumos & Flashcards')}
-          className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow-lg shadow-indigo-600/30 whitespace-nowrap border border-indigo-400/30"
-        >
-          <span>⚡</span> Resumos & Flashcards
-        </button>
-        <button
-          onClick={() => setSelectedTool('Arena X1 (Duelos)')}
-          className="flex items-center gap-2 bg-slate-900/90 border border-slate-800 text-slate-300 font-medium text-xs px-3 py-2 rounded-xl whitespace-nowrap hover:bg-slate-800 transition"
-        >
-          <span>⚔️</span> Arena X1
-        </button>
-        <button
-          onClick={() => setSelectedTool('Plano PRO')}
-          className="flex items-center gap-2 bg-slate-900/90 border border-slate-800 text-slate-300 font-medium text-xs px-3 py-2 rounded-xl whitespace-nowrap hover:bg-slate-800 transition"
-        >
-          <span>💎</span> Plano PRO
-        </button>
-        <button
-          onClick={() => setSelectedTool('Gráficos TRI')}
-          className="flex items-center gap-2 bg-slate-900/90 border border-slate-800 text-slate-300 font-medium text-xs px-3 py-2 rounded-xl whitespace-nowrap hover:bg-slate-800 transition"
-        >
-          <span>📈</span> Gráficos TRI
-        </button>
-      </div>
-
-      {/* Conteúdo Dinâmico com base na Aba Selecionada */}
-      {activeTab === 'perfil' ? (
-        /* Tela de Perfil & XP com Gráficos TRI */
-        <div className="space-y-4">
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-4 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-2xl">
-                👤
-              </div>
-              <div>
-                <h2 className="font-bold text-base text-white">Estudante Gabarita</h2>
-                <p className="text-xs text-indigo-400 font-medium">Nível 12 • 3.450 XP acumulados</p>
-                <div className="w-48 bg-slate-800 rounded-full h-1.5 mt-1.5 overflow-hidden">
-                  <div className="bg-gradient-to-r from-indigo-500 to-amber-400 h-1.5 rounded-full w-[70%]"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-4 backdrop-blur-sm">
-            <h3 className="font-bold text-sm text-slate-200 flex items-center gap-2">
-              <span>📈</span> Desempenho TRI Estimado
-            </h3>
-            <div className="space-y-3">
-              {[
-                { mat: 'Redação', score: 920, color: 'bg-emerald-500', width: 'w-[92%]' },
-                { mat: 'Matemática e Suas Tecnologias', score: 780, color: 'bg-indigo-500', width: 'w-[78%]' },
-                { mat: 'Ciências Humanas', score: 740, color: 'bg-purple-500', width: 'w-[74%]' },
-                { mat: 'Linguagens e Códigos', score: 710, color: 'bg-amber-500', width: 'w-[71%]' },
-                { mat: 'Ciências da Natureza', score: 670, color: 'bg-rose-500', width: 'w-[67%]' },
-              ].map((item, idx) => (
-                <div key={idx} className="space-y-1">
-                  <div className="flex justify-between text-xs font-medium">
-                    <span className="text-slate-300">{item.mat}</span>
-                    <span className="text-indigo-300 font-bold">{item.score} pts</span>
-                  </div>
-                  <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
-                    <div className={`${item.color} ${item.width} h-2 rounded-full`}></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* Grid de Pílulas do Topo (2 Colunas) */}
+      <section className="p-4 max-w-lg mx-auto">
+        <div className="grid grid-cols-2 gap-2">
+          {topPills.map((pill) => (
+            <button
+              key={pill.id}
+              onClick={() => setActiveTopPill(pill.id)}
+              className={`py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all border ${
+                activeTopPill === pill.id
+                  ? 'bg-purple-600 border-purple-400 text-white shadow-lg shadow-purple-600/30'
+                  : 'bg-[#121a2d] border-[#1e2a45] text-gray-300 hover:bg-[#18233c]'
+              }`}
+            >
+              <span>{pill.label}</span>
+            </button>
+          ))}
         </div>
-      ) : (
-        /* Categorias e Módulos em Grid 2 Colunas */
-        <div className="space-y-4">
-          {categories
-            .filter(cat => activeTab === 'home' || cat.tabId === activeTab)
-            .map((cat, idx) => (
-              <div
-                key={idx}
-                className="bg-slate-900/70 border border-slate-800/80 rounded-2xl p-3.5 space-y-3 backdrop-blur-sm"
-              >
-                <h2 className="text-xs font-bold text-slate-200 tracking-wide uppercase flex items-center gap-2">
-                  {cat.title}
-                </h2>
-                {/* GRID DE 2 COLUNAS NO CELULAR E NO DESKTOP */}
-                <div className="grid grid-cols-2 gap-2">
-                  {cat.items.map((item, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setSelectedTool(item.label)}
-                      className={`flex flex-col items-start p-3 rounded-xl text-left transition border ${
-                        item.highlight
-                          ? 'bg-gradient-to-br from-indigo-900/40 to-indigo-600/20 border-indigo-500/50 text-indigo-200 hover:border-indigo-400'
-                          : 'bg-slate-950/60 border-slate-800/80 text-slate-300 hover:bg-slate-800/60 hover:text-white'
-                      }`}
-                    >
-                      <span className="text-lg mb-1">{item.icon}</span>
-                      <span className="text-[11px] font-bold leading-tight line-clamp-2">{item.label}</span>
+      </section>
+
+      {/* Conteúdo Dinâmico das Abas */}
+      <main className="max-w-lg mx-auto px-4 space-y-6">
+
+        {/* TAB HOME */}
+        {activeTab === 'home' && (
+          <>
+            {/* Meta Diária de Estudos */}
+            <div className="bg-[#111827] border border-[#1f293d] rounded-2xl p-5 shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                  <Target size={14} /> Meta Personalizada
+                </span>
+                <div className="flex gap-2">
+                  <button className="text-[11px] text-gray-400 hover:text-white bg-[#1a2336] px-2.5 py-1 rounded-md border border-[#26334d]">
+                    Ocultar Gráfico
+                  </button>
+                  <button className="text-[11px] text-purple-300 hover:text-purple-200 bg-[#1a2336] px-2.5 py-1 rounded-md border border-[#26334d]">
+                    Editar Meta
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-center my-4">
+                <h2 className="text-lg font-bold text-white">Meta Diária de Estudos</h2>
+                <p className="text-xs text-purple-300 font-semibold mt-1">
+                  {dailyQuestions} de {dailyQuestionsGoal} Questões
+                </p>
+                <p className="text-[11px] text-gray-400 mt-0.5">
+                  Faltam {Math.max(0, dailyQuestionsGoal - dailyQuestions)} questões para completar sua meta diária!
+                </p>
+
+                <div className="flex justify-center gap-2 mt-4">
+                  <button 
+                    onClick={() => setDailyQuestions(prev => prev + 1)}
+                    className="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-lg shadow-purple-600/20"
+                  >
+                    + +1 Questão
+                  </button>
+                  <button 
+                    onClick={() => setDailyQuestions(prev => prev + 5)}
+                    className="bg-[#1c263c] hover:bg-[#253350] text-gray-200 text-xs font-bold px-3.5 py-2 rounded-xl border border-[#2b3a58] transition"
+                  >
+                    + +5 Questões
+                  </button>
+                  <button 
+                    onClick={() => setDailyQuestions(0)}
+                    className="bg-[#1c263c] hover:bg-[#253350] text-gray-300 text-xs font-bold px-3.5 py-2 rounded-xl border border-[#2b3a58] transition"
+                  >
+                    ✏️ Personalizar
+                  </button>
+                </div>
+              </div>
+
+              {/* Anel de Progresso Circular */}
+              <div className="flex flex-col items-center justify-center my-6">
+                <div className="relative w-28 h-28 flex items-center justify-center">
+                  <svg className="w-full h-full transform -rotate-90">
+                    <circle cx="56" cy="56" r="46" stroke="#1f293d" strokeWidth="10" fill="transparent" />
+                    <circle 
+                      cx="56" cy="56" r="46" 
+                      stroke="#8b5cf6" 
+                      strokeWidth="10" 
+                      fill="transparent" 
+                      strokeDasharray={289}
+                      strokeDashoffset={289 - (289 * Math.min(100, (dailyQuestions / dailyQuestionsGoal) * 100)) / 100}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute text-center">
+                    <span className="text-xl font-extrabold text-white">
+                      {Math.round(Math.min(100, (dailyQuestions / dailyQuestionsGoal) * 100))}%
+                    </span>
+                    <span className="block text-[9px] uppercase tracking-widest text-gray-400 font-bold">Progresso</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Gráfico dos 7 Dias */}
+              <div className="border-t border-[#1b253b] pt-4 mt-2">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-gray-300 flex items-center gap-1.5">
+                    <BarChart2 size={14} className="text-emerald-400" /> PROGRESSO DOS ÚLTIMOS 7 DIAS
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-gray-400 mb-4">
+                  <span className="text-emerald-400 font-medium">🔥 3 de 7 metas batidas</span>
+                  <span>📊 Total: 99 questões</span>
+                </div>
+
+                {/* Barras do Gráfico */}
+                <div className="flex items-end justify-between h-28 gap-2 pt-2 px-1">
+                  {[
+                    { day: 'Sáb', val: 26, status: 'hit' },
+                    { day: 'Dom', val: 14, status: 'progress' },
+                    { day: 'Seg', val: 20, status: 'hit' },
+                    { day: 'Ter', val: 5, status: 'progress' },
+                    { day: 'Qua', val: 20, status: 'hit' },
+                    { day: 'Qui', val: 14, status: 'progress' },
+                    { day: 'Hoje', val: dailyQuestions, status: dailyQuestions >= dailyQuestionsGoal ? 'hit' : 'progress' },
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+                      <div 
+                        style={{ height: `${Math.min(100, (item.val / 28) * 100)}%` }}
+                        className={`w-full rounded-t-md transition-all duration-300 ${
+                          item.status === 'hit' 
+                            ? 'bg-emerald-500 shadow-lg shadow-emerald-500/20' 
+                            : 'bg-indigo-600'
+                        }`}
+                      />
+                      <span className="text-[10px] text-gray-400 font-medium">{item.day}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Legenda do Gráfico */}
+                <div className="flex items-center justify-between text-[10px] text-gray-400 mt-4 border-t border-[#1b253b] pt-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" /> Meta Batida
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-indigo-600" /> Em Progresso
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-gray-600" /> Sem Atividade
+                  </div>
+                  <span className="text-purple-400 font-semibold">43% de taxa</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Raio-X de Atividade por Disciplina */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-amber-400 flex items-center gap-1.5">
+                  <span>🎯 Raio-X de Atividade por Disciplina</span>
+                </h3>
+                <span className="text-[10px] text-gray-400">Histórico no Navegador</span>
+              </div>
+
+              <div className="space-y-2">
+                {subjects.map((sub, i) => (
+                  <div 
+                    key={i} 
+                    className="bg-[#111827] border border-[#1f293d] rounded-xl p-3.5 flex items-center justify-between hover:border-purple-500/40 transition cursor-pointer"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">{sub.icon}</span>
+                        <span className="text-xs font-bold text-white">{sub.name}</span>
+                      </div>
+                      <p className="text-[10px] text-amber-400/90 font-medium mt-1">
+                        Iniciar primeiro treino
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="bg-[#1c263c] text-gray-300 text-[10px] font-semibold px-2 py-0.5 rounded-md border border-[#2b3a58]">
+                        Novo
+                      </span>
+                      <ChevronRight size={14} className="text-gray-500" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* TAB ARENA */}
+        {activeTab === 'arena' && (
+          <div className="space-y-4">
+            <div className="bg-gradient-to-br from-indigo-900/60 to-purple-900/40 border border-indigo-500/30 rounded-2xl p-5 shadow-xl">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-purple-300 flex items-center gap-1">
+                  ⚔️ Arena X1 <span className="bg-red-500/20 text-red-400 text-[9px] px-1.5 py-0.5 rounded uppercase font-extrabold ml-1">AO VIVO</span>
+                </span>
+              </div>
+              <p className="text-xs text-gray-300">
+                Duelos e quizzes competitivos em tempo real entre vestibulandos de todo o Brasil.
+              </p>
+
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                <div className="bg-[#0b101d]/80 p-3 rounded-xl border border-[#1d2840]">
+                  <span className="text-[10px] text-gray-400 font-bold block uppercase">Patente</span>
+                  <span className="text-xs font-bold text-amber-400 mt-0.5 block">👑 Bixo Federal</span>
+                </div>
+                <div className="bg-[#0b101d]/80 p-3 rounded-xl border border-[#1d2840]">
+                  <span className="text-[10px] text-gray-400 font-bold block uppercase">Vitórias</span>
+                  <span className="text-xs font-bold text-emerald-400 mt-0.5 block">🏆 28V / 100</span>
+                </div>
+                <div className="bg-[#0b101d]/80 p-3 rounded-xl border border-[#1d2840]">
+                  <span className="text-[10px] text-gray-400 font-bold block uppercase">Streak</span>
+                  <span className="text-xs font-bold text-orange-400 mt-0.5 block">🔥 0 Seguidas</span>
+                </div>
+                <div className="bg-[#0b101d]/80 p-3 rounded-xl border border-[#1d2840]">
+                  <span className="text-[10px] text-gray-400 font-bold block uppercase">Saldo XP</span>
+                  <span className="text-xs font-bold text-purple-400 mt-0.5 block">⚡ 4000 XP</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-[#111827] border border-[#1f293d] rounded-2xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <Swords size={16} className="text-purple-400" /> Desafio 1v1 com Amigos
+                </h4>
+                <span className="text-[10px] bg-indigo-500/20 text-indigo-300 font-bold px-2 py-0.5 rounded border border-indigo-500/30">
+                  SALA PRIVADA
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 mb-4">
+                Crie uma sala exclusiva e envie o link no WhatsApp para disputar quem gabarita mais rápido.
+              </p>
+              <button className="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2">
+                <span>🔗 Criar Desafio</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* TAB CONTEÚDOS */}
+        {activeTab === 'conteudos' && (
+          <div className="space-y-4">
+            <div className="bg-[#111827] border border-[#1f293d] rounded-2xl p-4">
+              <h3 className="text-xs font-bold text-amber-400 flex items-center gap-1.5 mb-1">
+                <span>🍱 Bento IA - Gerador de Estudos</span>
+              </h3>
+              <p className="text-[11px] text-gray-400 mb-3">
+                Digite um assunto para gerar resumos, pontos-chave e flashcards instantâneos.
+              </p>
+
+              <div className="space-y-3">
+                <input 
+                  type="text" 
+                  placeholder="Ex: Ecologia, Geometria Plana, Termoquímica..." 
+                  className="w-full bg-[#0b101d] border border-[#1f293d] rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500 placeholder-gray-500"
+                />
+                <button className="w-full bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-lg shadow-amber-600/20">
+                  ✨ Gerar Kit de Estudos com Bento IA
+                </button>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-[#1b253b]">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">
+                  🔥 MAIS COBRADOS NO ENEM
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {['+ Ecologia', '+ Geometria Plana', '+ Termoquímica', '+ Brasil Colônia', '+ Estatística', '+ Funções de 1º e 2º Grau'].map((tag, idx) => (
+                    <button key={idx} className="bg-[#1c263c] text-gray-300 text-[10px] font-semibold px-2.5 py-1 rounded-lg border border-[#2b3a58] hover:border-purple-500">
+                      {tag}
                     </button>
                   ))}
                 </div>
               </div>
-            ))}
-        </div>
-      )}
-
-      {/* Modal Interativo para quando clica em qualquer ferramenta */}
-      {selectedTool && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 max-w-md w-full space-y-4 shadow-2xl relative animate-in fade-in zoom-in-95">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-bold text-lg text-white flex items-center gap-2">
-                  <span>✨</span> {selectedTool}
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">Módulo ativo no Gabarita AI PRO</p>
-              </div>
-              <button
-                onClick={() => setSelectedTool(null)}
-                className="text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-lg text-xs"
-              >
-                ✕
-              </button>
             </div>
+          </div>
+        )}
 
-            {selectedTool === 'Gráficos TRI' ? (
-              <div className="space-y-3 text-xs">
-                <p className="text-slate-300">Sua evolução estimada nos últimos simulados:</p>
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2 font-mono">
-                  <p className="text-emerald-400">• Média Geral: 764.2 TRI</p>
-                  <p className="text-indigo-400">• Percentual de Acertos: 82%</p>
-                  <p className="text-amber-400">• Consistência: Média Prova Oficial</p>
+        {/* TAB REDAÇÃO & IA */}
+        {activeTab === 'redacao' && (
+          <div className="space-y-4">
+            <div className="bg-[#111827] border border-[#1f293d] rounded-2xl p-4">
+              <h3 className="text-xs font-bold text-amber-400 flex items-center gap-1.5 mb-1">
+                <span>✍️ Corretor de Redação</span>
+              </h3>
+              <p className="text-[11px] text-gray-400 mb-3">
+                Análise focada na Competência 5 do ENEM (0 a 200 pontos)
+              </p>
+
+              <button className="text-[11px] text-purple-300 bg-[#1c263c] px-3 py-1.5 rounded-lg border border-[#2b3a58] mb-3 flex items-center gap-1 font-semibold">
+                ✨ Carregar Exemplo Nota 200
+              </button>
+
+              <textarea 
+                rows={5}
+                placeholder="Cole seu texto ou proposta de intervenção aqui..."
+                className="w-full bg-[#0b101d] border border-[#1f293d] rounded-xl p-3 text-xs text-white focus:outline-none focus:border-purple-500 placeholder-gray-500 resize-none"
+              />
+
+              <button className="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-lg shadow-purple-600/30 mt-3 flex items-center justify-center gap-2">
+                🤖 Avaliar Competência 5
+              </button>
+
+              <div className="mt-4 pt-3 border-t border-[#1b253b]">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[11px] font-bold text-gray-300">Elementos da C5:</span>
+                  <span className="text-[10px] text-gray-400">40 pontos cada</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {['1. Agente (Quem faz?)', '2. Ação (O que faz?)', '3. Meio/Modo (Como faz?)', '4. Efeito (Para quê?)', '5. Detalhamento (A mais)'].map((elem, i) => (
+                    <div key={i} className={`bg-[#0b101d] p-2 rounded-lg border border-[#1f293d] text-[10px] text-gray-300 ${i === 4 ? 'col-span-2' : ''}`}>
+                      {elem}
+                    </div>
+                  ))}
                 </div>
               </div>
-            ) : selectedTool === 'Plano PRO' ? (
-              <div className="space-y-3 text-xs">
-                <p className="text-slate-300">Desbloqueie perguntas ilimitadas, leitura OCR e modelo Gemini 2.5 Flash por apenas R$ 5,00/mês.</p>
-                <button className="w-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-bold py-2.5 rounded-xl text-center">
-                  Assinar por R$ 5,00/mês
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3 text-xs text-slate-300">
-                <p>Ferramenta pronta para uso! Digite sua pergunta ou selecione o tópico para iniciar a simulação com a inteligência do Gemini.</p>
-                <textarea
-                  placeholder="Digite aqui o que você deseja analisar ou gerar..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-indigo-500 h-24 text-xs resize-none"
-                ></textarea>
-                <button
-                  onClick={() => {
-                    alert(`Iniciando processamento de "${selectedTool}" com Gemini...`);
-                    setSelectedTool(null);
-                  }}
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl transition text-center"
-                >
-                  🚀 Executar com IA
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Modal / Chat Flutuante da Gabi IA */}
-      {isGabiOpen && (
-        <div className="fixed inset-x-4 bottom-20 z-50 max-w-sm mx-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col h-96 overflow-hidden">
-          <div className="bg-gradient-to-r from-emerald-900/60 to-purple-900/60 p-3 border-b border-slate-800 flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="font-bold text-xs text-white">Gabi IA - Assistente de Estudo</span>
             </div>
-            <button onClick={() => setIsGabiOpen(false)} className="text-slate-400 hover:text-white text-xs bg-slate-800/80 px-2 py-0.5 rounded">
-              ✕
+          </div>
+        )}
+
+        {/* TAB SIMULADOS */}
+        {activeTab === 'simulados' && (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              {[
+                { title: 'ENEM 2025 - Dia 1', status: 'Disponível', time: '330 min', desc: '90 questões • Linguagens, Códigos e Ciências Humanas + Redação' },
+                { title: 'ENEM 2025 - Dia 2', status: 'Disponível', time: '300 min', desc: '90 questões • Matemática e Ciências da Natureza' },
+                { title: 'Simulado Inédito - Exatas', status: 'Recomendado', time: '150 min', desc: '45 questões • Matemática, Física e Química Focada na TRI' },
+              ].map((sim, i) => (
+                <div key={i} className="bg-[#111827] border border-[#1f293d] rounded-2xl p-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <h4 className="text-xs font-bold text-white">{sim.title}</h4>
+                    <span className="bg-purple-500/20 text-purple-300 text-[10px] font-bold px-2 py-0.5 rounded border border-purple-500/30">
+                      {sim.status}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-gray-400 mb-3">{sim.desc}</p>
+                  <button className="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2 rounded-xl transition shadow-lg shadow-purple-600/30 flex items-center justify-center gap-1">
+                    <Play size={12} /> Iniciar
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB PERFIL */}
+        {activeTab === 'perfil' && (
+          <div className="space-y-4">
+            {/* Header Perfil */}
+            <div className="bg-[#111827] border border-[#1f293d] rounded-2xl p-5 text-center">
+              <div className="relative w-16 h-16 mx-auto mb-3">
+                <div className="w-full h-full rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 p-0.5 shadow-lg">
+                  <div className="w-full h-full bg-[#0d1322] rounded-[14px] flex items-center justify-center text-2xl">
+                    🎓
+                  </div>
+                </div>
+              </div>
+              <h3 className="text-sm font-bold text-white flex items-center justify-center gap-1">
+                Estudante Focado ✏️
+              </h3>
+              <p className="text-[11px] text-purple-300 font-medium">Estudante GabaritaAí</p>
+
+              <div className="flex justify-center gap-2 mt-3">
+                <span className="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-amber-500/20">
+                  🎗️ Patente: Calouro Promissor
+                </span>
+                <span className="bg-orange-500/10 text-orange-400 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-orange-500/20">
+                  🔥 7 dias de Sequência
+                </span>
+              </div>
+            </div>
+
+            {/* Configurações de Meta Acadêmica */}
+            <div className="bg-[#111827] border border-[#1f293d] rounded-2xl p-4 space-y-3">
+              <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">
+                🎓 META ACADÊMICA & FOCO DE ESTUDOS
+              </span>
+
+              <div>
+                <label className="text-[11px] text-gray-400 font-medium block mb-1">Curso Desejado:</label>
+                <select 
+                  value={desiredCourse} 
+                  onChange={(e) => setDesiredCourse(e.target.value)}
+                  className="w-full bg-[#0b101d] border border-[#1f293d] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"
+                >
+                  <option value="Medicina">Medicina</option>
+                  <option value="Direito">Direito</option>
+                  <option value="Engenharia de Software">Engenharia de Software</option>
+                  <option value="Psicologia">Psicologia</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[11px] text-gray-400 font-medium block mb-1">Exame / Foco Principal:</label>
+                <select 
+                  value={targetExam} 
+                  onChange={(e) => setTargetExam(e.target.value)}
+                  className="w-full bg-[#0b101d] border border-[#1f293d] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"
+                >
+                  <option value="ENEM 2026">ENEM 2026</option>
+                  <option value="FUVEST 2026">FUVEST 2026</option>
+                  <option value="UNICAMP 2026">UNICAMP 2026</option>
+                </select>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-gray-400 font-medium">Meta Diária de Horas:</span>
+                  <span className="text-amber-400 font-bold">{dailyHoursGoal} / dia</span>
+                </div>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {['1h', '2h', '4h', '6h', '8h'].map((hrs) => (
+                    <button 
+                      key={hrs}
+                      onClick={() => setDailyHoursGoal(hrs)}
+                      className={`py-1.5 text-xs font-bold rounded-lg border transition ${
+                        dailyHoursGoal === hrs 
+                          ? 'bg-purple-600 border-purple-400 text-white' 
+                          : 'bg-[#0b101d] border-[#1f293d] text-gray-400'
+                      }`}
+                    >
+                      {hrs}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-gray-400 font-medium">Meta Diária de Questões:</span>
+                  <span className="text-amber-400 font-bold">{dailyQuestionsGoal} questões</span>
+                </div>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {[10, 20, 30, 50, 100].map((q) => (
+                    <button 
+                      key={q}
+                      onClick={() => setDailyQuestionsGoal(q)}
+                      className={`py-1.5 text-xs font-bold rounded-lg border transition ${
+                        dailyQuestionsGoal === q 
+                          ? 'bg-amber-500 border-amber-400 text-slate-950' 
+                          : 'bg-[#0b101d] border-[#1f293d] text-gray-400'
+                      }`}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Botão Flutuante Gabi IA */}
+      <button 
+        onClick={() => setIsGabiOpen(!isGabiOpen)}
+        className="fixed bottom-20 right-4 z-40 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs px-4 py-2.5 rounded-full shadow-2xl shadow-purple-600/50 flex items-center gap-2 transition transform active:scale-95 border border-purple-400/30"
+      >
+        <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse" />
+        <span>🟢 Gabi IA</span>
+      </button>
+
+      {/* Modal Chat Gabi IA */}
+      {isGabiOpen && (
+        <div className="fixed inset-x-4 bottom-24 max-w-lg mx-auto z-50 bg-[#0d1322] border border-purple-500/40 rounded-2xl p-4 shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom duration-200">
+          <div className="flex items-center justify-between border-b border-[#1b253b] pb-3 mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center text-xs">
+                🤖
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-white">Gabi IA</h4>
+                <p className="text-[9px] text-emerald-400 font-semibold">Online e pronta para tirar dúvidas</p>
+              </div>
+            </div>
+            <button onClick={() => setIsGabiOpen(false)} className="text-gray-400 hover:text-white">
+              <X size={16} />
             </button>
           </div>
-
-          <div className="flex-1 p-3 overflow-y-auto space-y-2 text-xs">
-            {chatMessages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`p-2.5 rounded-xl max-w-[85%] ${
-                  msg.sender === 'user'
-                    ? 'bg-indigo-600 text-white ml-auto'
-                    : 'bg-slate-950 border border-slate-800 text-slate-200'
-                }`}
-              >
-                {msg.text}
-              </div>
-            ))}
+          <div className="bg-[#070a12] rounded-xl p-3 h-40 overflow-y-auto mb-3 text-xs text-gray-300 space-y-2 border border-[#1b253b]">
+            <div className="bg-[#131c30] p-2.5 rounded-xl max-w-[85%] text-gray-200">
+              Oi! Sou a Gabi IA. Como posso te ajudar nos seus estudos hoje? 🚀
+            </div>
           </div>
-
-          <div className="p-2 border-t border-slate-800 bg-slate-950 flex gap-2">
-            <input
-              type="text"
-              value={inputMsg}
-              onChange={(e) => setInputMsg(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="Pergunte à Gabi IA..."
-              className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+          <div className="flex gap-2">
+            <input 
+              type="text" 
+              placeholder="Digite sua dúvida..." 
+              className="flex-1 bg-[#070a12] border border-[#1b253b] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"
             />
-            <button onClick={handleSendMessage} className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-3 py-2 rounded-xl text-xs">
+            <button className="bg-purple-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-purple-500">
               Enviar
             </button>
           </div>
         </div>
       )}
 
-      {/* Botão Flutuante Gabi IA */}
-      <div className="fixed bottom-20 right-4 z-40">
-        <button
-          onClick={() => setIsGabiOpen(!isGabiOpen)}
-          className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-purple-600 text-slate-950 font-extrabold px-4 py-2.5 rounded-full shadow-xl shadow-purple-950/60 flex items-center gap-2 text-xs hover:scale-105 transition transform border border-emerald-300/40"
-        >
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-950 animate-pulse"></span>
-          <span>🟢 Gabi IA</span>
-        </button>
-      </div>
-
-      {/* Barra de Navegação Inferior Fixa */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-[#070913]/95 backdrop-blur-md border-t border-slate-800/90 px-2 py-2 z-40 max-w-4xl mx-auto flex justify-around items-center">
-        {[
-          { id: 'home', label: 'Home', icon: '🏠' },
-          { id: 'arena', label: 'Arena X1', icon: '⚔️', badge: 'X1' },
-          { id: 'conteudos', label: 'Conteúdos', icon: '📚' },
-          { id: 'redacao', label: 'Redação & IA', icon: '✍️', badge: 'IA' },
-          { id: 'simulados', label: 'Simulados', icon: '🎯' },
-          { id: 'perfil', label: 'Perfil & XP', icon: '👤' },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`relative flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg text-[10px] font-medium transition ${
-              activeTab === tab.id
-                ? 'text-indigo-400 font-bold scale-105'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <span className="text-base">{tab.icon}</span>
-            <span>{tab.label}</span>
-            {tab.badge && (
-              <span className="absolute -top-1 right-0.5 bg-amber-500 text-slate-950 font-extrabold text-[8px] px-1 rounded-full">
-                {tab.badge}
-              </span>
-            )}
-          </button>
-        ))}
+      {/* Rodapé Fixo de Navegação por Abas */}
+      <nav className="fixed bottom-0 inset-x-0 z-40 bg-[#0d1322]/95 backdrop-blur-md border-t border-[#1b253b] max-w-lg mx-auto">
+        <div className="grid grid-cols-6 h-16">
+          {[
+            { id: 'home', label: 'Home', icon: Home },
+            { id: 'arena', label: 'Arena ⚔️', icon: Swords },
+            { id: 'conteudos', label: 'Conteúdos', icon: BookOpen },
+            { id: 'redacao', label: 'Redação & IA', icon: PenTool },
+            { id: 'simulados', label: 'Simulados', icon: Target },
+            { id: 'perfil', label: 'Perfil & XP', icon: User },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex flex-col items-center justify-center gap-1 transition ${
+                  isActive ? 'text-purple-400 font-bold' : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                <Icon size={18} className={isActive ? 'stroke-[2.5]' : 'stroke-[1.75]'} />
+                <span className="text-[9px] truncate max-w-full px-0.5">{tab.label}</span>
+                {isActive && <span className="w-1 h-1 bg-purple-400 rounded-full -mt-0.5" />}
+              </button>
+            );
+          })}
+        </div>
       </nav>
     </div>
   );
