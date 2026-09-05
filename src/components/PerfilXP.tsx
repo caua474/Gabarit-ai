@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Trophy, Flame, Zap, Share2, Sparkles, CheckCircle2 } from 'lucide-react';
-import { CardResumoProdutividadeEnem } from './CardResumoProdutividadeEnem';
+import { Trophy, Flame, Zap, Share2, Sparkles, CheckCircle2, BookOpen, Target } from 'lucide-react';
 
 interface Achievement {
   id: string;
@@ -150,13 +149,36 @@ export default function PerfilXP({
         </div>
       </div>
 
-      {/* Resumo de Produtividade */}
-      {CardResumoProdutividadeEnem && (
-        <CardResumoProdutividadeEnem
-          onNavigateToRedacao={onNavigateToRedacao}
-          onNavigateToSimulados={onNavigateToSimulados}
-        />
-      )}
+      {/* Resumo de Produtividade ENEM */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <Target className="w-4 h-4 text-indigo-400" />
+          Produtividade Semanal das Competências ENEM
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            onClick={onNavigateToRedacao}
+            className="p-4 bg-slate-950/60 border border-slate-800 hover:border-indigo-500/50 rounded-xl text-left transition-all group"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold text-slate-200">Prática de Redação</span>
+              <BookOpen className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
+            </div>
+            <p className="text-xs text-slate-400">2 redações corrigidas esta semana com foco em C3 e C4.</p>
+          </button>
+
+          <button
+            onClick={onNavigateToSimulados}
+            className="p-4 bg-slate-950/60 border border-slate-800 hover:border-emerald-500/50 rounded-xl text-left transition-all group"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold text-slate-200">Simulados TRI</span>
+              <Trophy className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+            </div>
+            <p className="text-xs text-slate-400">Média de 710 pontos nas disciplinas de Exatas.</p>
+          </button>
+        </div>
+      </div>
 
       {/* Seção de Conquistas */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
@@ -209,4 +231,3 @@ export default function PerfilXP({
     </div>
   );
 }
-
