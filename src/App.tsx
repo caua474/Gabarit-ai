@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 import { Header } from './components/Header';
 import { NavigationTabs, AbaAtiva } from './components/NavigationTabs';
 import { BottomNavigationBar, PrimaryTab } from './components/BottomNavigationBar';
@@ -175,7 +175,6 @@ export default function App() {
     playClickSound();
     setPrimaryTab(tab);
 
-    // Set recommended default subtab for each category
     if (tab === 'conteudos' && !['flashcards', 'biblioteca', 'catalogo', 'glossario_enem', 'mapas_mentais', 'feynman_audio', 'pilulas_conhecimento', 'audio_podcasts', 'auto_flashcards', 'duvidas'].includes(abaAtiva)) {
       setAbaAtiva('flashcards');
     } else if (tab === 'redacao_ia' && !['redacao', 'c5_intervencao', 'repertorio', 'esquema_redacao', 'radar_redacao', 'advogado_diabo'].includes(abaAtiva)) {
@@ -194,7 +193,7 @@ export default function App() {
       {/* Offline Status Indicator */}
       <OfflineStatusBanner />
 
-      {/* Daily Study Tip (Auto-prompts if not seen today) */}
+      {/* Daily Study Tip Modal */}
       <DailyStudyTipModal />
 
       {/* Application Header */}
@@ -282,7 +281,7 @@ export default function App() {
         {primaryTab === 'home' && (
           <DashboardPrincipal
             onOpenGabi={() => setActiveModal('gabi')}
-            onSelectDisciplina={(materia) => {
+            onSelectDisciplina={(_materia) => {
               setPrimaryTab('conteudos');
               setAbaAtiva('biblioteca');
             }}
@@ -340,7 +339,7 @@ export default function App() {
             )}
             {abaAtiva === 'catalogo' && (
               <SubjectCatalogSection
-                onSelectTopicAction={(materia, topicoNome, acao) => {
+                onSelectTopicAction={(_materia, _topicoNome, acao) => {
                   if (acao === 'flashcard') {
                     setAbaAtiva('flashcards');
                   } else if (acao === 'duvida') {
@@ -388,7 +387,7 @@ export default function App() {
             {abaAtiva === 'repertorio' && <RepertoriosCoringaSection />}
             {abaAtiva === 'esquema_redacao' && (
               <EssaySkeletonCanvasSection
-                onSendToAnalyzer={(skeleton) => {
+                onSendToAnalyzer={(_skeleton) => {
                   setAbaAtiva('redacao');
                 }}
               />
@@ -742,4 +741,4 @@ export default function App() {
       </AnimatePresence>
     </div>
   );
-}
+              }
