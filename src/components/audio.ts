@@ -10,7 +10,7 @@ export const playClickSound = () => {
     osc.start();
     osc.stop(audioCtx.currentTime + 0.05);
   } catch (e) {
-    // Silencia erros caso o navegador bloqueie o áudio automático
+    // Ignora restrições de áudio do navegador
   }
 };
 
@@ -21,12 +21,12 @@ export const playSuccessSound = () => {
     const gain = audioCtx.createGain();
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-    osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.1);
     gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
     osc.start();
     osc.stop(audioCtx.currentTime + 0.2);
   } catch (e) {
-    // Silencia erros caso o navegador bloqueie o áudio automático
+    // Ignora restrições de áudio do navegador
   }
 };
