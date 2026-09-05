@@ -4,11 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx server.ts",outfile=dist/server.cjs",
+    "dev": "vite",
     "build": "vite build",
-    "start": "node dist/server.cjs",
+    "start": "vite preview",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
