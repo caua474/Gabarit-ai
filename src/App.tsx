@@ -3,7 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import { Header } from './components/Header';
 import { NavigationTabs, AbaAtiva } from './components/NavigationTabs';
 import { BottomNavigationBar, PrimaryTab } from './components/BottomNavigationBar';
-import DashboardPrincipal from './components/DashboardPrincipal';
+import { DashboardPrincipal } from './components/DashboardPrincipal';
 import { ArenaX1Section } from './components/ArenaX1Section';
 import ConteudosBentoIA from './components/ConteudosBentoIA';
 import { BibliotecaSection } from './components/BibliotecaSection';
