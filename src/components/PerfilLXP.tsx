@@ -6,7 +6,7 @@ interface Achievement {
   id: string;
   icon: string;
   title: string;
-  description: string;
+  description: string; 
   xpReward: number;
   unlocked: boolean;
   progress?: string;
