@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence } from 'framer-motion';
 import { Header } from './components/Header';
 import { NavigationTabs, AbaAtiva } from './components/NavigationTabs';
 import { BottomNavigationBar, PrimaryTab } from './components/BottomNavigationBar';
@@ -190,13 +190,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
-      {/* Offline Status Indicator */}
       <OfflineStatusBanner />
-
-      {/* Daily Study Tip Modal */}
       <DailyStudyTipModal />
 
-      {/* Application Header */}
       <Header
         historyCount={materials.length + tutorPlans.length + eli5Explanations.length}
         studyStreak={studyStreak}
@@ -265,7 +261,6 @@ export default function App() {
         }}
       />
 
-      {/* Top Feature Sub-Navigation Tabs */}
       {primaryTab !== 'opcoes_hub' && primaryTab !== 'home' && (
         <NavigationTabs
           primaryTab={primaryTab}
@@ -275,9 +270,7 @@ export default function App() {
         />
       )}
 
-      {/* Main Content Area */}
       <div id="tab-content-area" className="flex-1 w-full">
-        {/* 1. HOME TAB */}
         {primaryTab === 'home' && (
           <DashboardPrincipal
             onOpenGabi={() => setActiveModal('gabi')}
@@ -317,14 +310,12 @@ export default function App() {
           </DashboardPrincipal>
         )}
 
-        {/* 2. ARENA TAB */}
         {primaryTab === 'arena' && (
           <main className="max-w-7xl mx-auto px-4 pb-28 pt-2">
             <ArenaX1Section onAddXP={handleAddXP} />
           </main>
         )}
 
-        {/* 3. CONTEÚDOS TAB */}
         {primaryTab === 'conteudos' && (
           <main className="max-w-7xl mx-auto px-4 pb-28 pt-2">
             {abaAtiva === 'flashcards' && <ConteudosBentoIA />}
@@ -379,7 +370,6 @@ export default function App() {
           </main>
         )}
 
-        {/* 4. REDAÇÃO & IA TAB */}
         {primaryTab === 'redacao_ia' && (
           <main className="max-w-7xl mx-auto px-4 pb-28 pt-2">
             {abaAtiva === 'redacao' && <RedacaoCorretor />}
@@ -405,7 +395,6 @@ export default function App() {
           </main>
         )}
 
-        {/* 5. SIMULADOS & TREINO TAB */}
         {primaryTab === 'simulados_treino' && (
           <main className="max-w-7xl mx-auto px-4 pb-28 pt-2">
             {abaAtiva === 'simulado_tri' && <Simulados />}
@@ -429,7 +418,6 @@ export default function App() {
           </main>
         )}
 
-        {/* 6. PERFIL & GAMIFICAÇÃO TAB */}
         {primaryTab === 'perfil_gamificacao' && (
           <main className="max-w-7xl mx-auto px-4 pb-28 pt-2">
             {abaAtiva === 'mascote_xp' && (
@@ -499,7 +487,6 @@ export default function App() {
           </main>
         )}
 
-        {/* 7. OPÇÕES GERAIS / HUB */}
         {primaryTab === 'opcoes_hub' && (
           <CentralDeOpcoesSection
             userProfile={userProfile}
@@ -518,15 +505,12 @@ export default function App() {
         )}
       </div>
 
-      {/* Bottom Navigation Bar */}
       <BottomNavigationBar
         activePrimaryTab={primaryTab}
         onSelectPrimaryTab={handleSelectPrimaryTab}
       />
 
-      {/* Modals & Overlays */}
       <AnimatePresence>
-        {/* Profile Settings Modal */}
         {activeModal === 'profile' && (
           <ProfileSettingsModal
             studyStreak={studyStreak}
@@ -537,12 +521,10 @@ export default function App() {
           />
         )}
 
-        {/* PRO Subscription Modal */}
         {activeModal === 'pro' && (
           <ProSubscriptionModal onClose={() => setActiveModal(null)} />
         )}
 
-        {/* Professora Gabi AI Assistant Modal */}
         {activeModal === 'gabi' && (
           <GabiAssistantModal
             initialPrompt={gabiInitialPrompt}
@@ -566,7 +548,6 @@ export default function App() {
           />
         )}
 
-        {/* Onboarding Tutorial Modal */}
         {activeModal === 'onboarding' && (
           <OnboardingModal
             onSaveProfile={(updatedProfile) => {
@@ -577,7 +558,6 @@ export default function App() {
           />
         )}
 
-        {/* History Modal */}
         {activeModal === 'history' && (
           <HistoryModal
             materials={materials}
@@ -630,7 +610,6 @@ export default function App() {
           />
         )}
 
-        {/* How It Works Tutorial Modal */}
         {activeModal === 'how_it_works' && (
           <HowItWorksModal
             onNavigateModule={(tab, sub) => {
@@ -642,7 +621,6 @@ export default function App() {
           />
         )}
 
-        {/* Study Streak Calendar Modal */}
         {activeModal === 'calendar' && (
           <StudyCalendarModal
             studyStreak={studyStreak}
@@ -651,7 +629,6 @@ export default function App() {
           />
         )}
 
-        {/* Banca Personality Selector Modal */}
         {activeModal === 'banca' && (
           <BancaPersonalitySelectorModal
             isOpen={true}
@@ -659,7 +636,6 @@ export default function App() {
           />
         )}
 
-        {/* General Options Modal */}
         {activeModal === 'opcoes' && (
           <OpcoesGeraisModal
             isOpen={true}
@@ -675,7 +651,6 @@ export default function App() {
           />
         )}
 
-        {/* Interactive Quiz Modal */}
         {activeModal === 'interactive_quiz' && selectedMaterial && (
           <InteractiveQuizModal
             material={selectedMaterial}
@@ -701,7 +676,6 @@ export default function App() {
           />
         )}
 
-        {/* Social Share Story Modal */}
         {activeModal === 'social_story' && (
           <SocialShareStoryModal
             type={socialStoryData?.type || 'mascote'}
@@ -719,7 +693,6 @@ export default function App() {
           />
         )}
 
-        {/* Printable ENEM Essay Sheet Modal */}
         {activeModal === 'printable_sheet' && (
           <EnemPrintableSheetModal
             initialTheme={printSheetTheme}
@@ -730,7 +703,6 @@ export default function App() {
           />
         )}
 
-        {/* Microphone Permission Modal */}
         {activeModal === 'microphone' && (
           <MicrophonePermissionModal
             isOpen={true}
@@ -741,4 +713,4 @@ export default function App() {
       </AnimatePresence>
     </div>
   );
-              }
+}
