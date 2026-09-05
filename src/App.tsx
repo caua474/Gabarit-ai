@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence } from 'framer-motion';
 import { Header } from './components/Header';
 import { NavigationTabs, AbaAtiva } from './components/NavigationTabs';
 import { BottomNavigationBar, PrimaryTab } from './components/BottomNavigationBar';
@@ -266,7 +266,7 @@ export default function App() {
         }}
       />
 
-      {/* Top Feature Sub-Navigation Tabs (Active on specific modules, hidden on home/opcoes to keep home clean) */}
+      {/* Top Feature Sub-Navigation Tabs */}
       {primaryTab !== 'opcoes_hub' && primaryTab !== 'home' && (
         <NavigationTabs
           primaryTab={primaryTab}
@@ -308,7 +308,6 @@ export default function App() {
             }}
           >
             <div className="max-w-7xl mx-auto px-4 pb-20">
-              {/* Organized Category Cards & Quick Access Hub */}
               <HomeHubCategories
                 onNavigate={(targetPrimary, targetSub) => {
                   setPrimaryTab(targetPrimary);
@@ -743,4 +742,4 @@ export default function App() {
       </AnimatePresence>
     </div>
   );
-            }
+}
