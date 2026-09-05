@@ -1,43 +1,69 @@
 import React from 'react';
+import { PrimaryTab } from './BottomNavigationBar';
+
+export type AbaAtiva =
+  | 'flashcards'
+  | 'biblioteca'
+  | 'catalogo'
+  | 'glossario_enem'
+  | 'mapas_mentais'
+  | 'feynman_audio'
+  | 'pilulas_conhecimento'
+  | 'audio_podcasts'
+  | 'auto_flashcards'
+  | 'duvidas'
+  | 'redacao'
+  | 'c5_intervencao'
+  | 'repertorio'
+  | 'esquema_redacao'
+  | 'radar_redacao'
+  | 'advogado_diabo'
+  | 'simulado_tri'
+  | 'simulado_adaptativo'
+  | 'reels_feed'
+  | 'desafios'
+  | 'caderno_erros'
+  | 'corretor_gabarito'
+  | 'estratégia_chute'
+  | 'som_ambiente'
+  | 'mascote_xp'
+  | 'estatisticas_estudo'
+  | 'ranking'
+  | 'reta_final'
+  | 'planner_rotina'
+  | 'sisu_simulator'
+  | 'folha_vespera'
+  | 'arena_x1';
 
 interface NavigationTabsProps {
-  activePill: string;
-  onSelectPill: (pillId: string) => void;
+  primaryTab: PrimaryTab;
+  abaAtiva: AbaAtiva;
+  setAbaAtiva: (tab: AbaAtiva) => void;
+  onTabChange?: (tab: AbaAtiva) => void;
 }
 
 export const NavigationTabs: React.FC<NavigationTabsProps> = ({
-  activePill,
-  onSelectPill,
+  abaAtiva,
+  setAbaAtiva,
+  onTabChange,
 }) => {
-  const topPills = [
-    { id: 'bento', label: '🍱 Bento AI' },
-    { id: 'banca', label: '🏛️ Banca IA' },
-    { id: 'calendario', label: '📅 Calendário' },
-    { id: 'flashcards', label: '🎴 Flashcards' },
-    { id: 'ranking', label: '🏆 Ranking' },
-    { id: 'professora', label: '🧑‍🏫 Professora IA' },
-    { id: 'pro', label: '💎 Plano PRO' },
-    { id: 'graficos', label: '📈 Gráficos TRI' },
-  ];
+  const handleSelect = (sub: AbaAtiva) => {
+    setAbaAtiva(sub);
+    if (onTabChange) onTabChange(sub);
+  };
 
   return (
-    <section className="p-4 max-w-lg mx-auto">
-      <div className="grid grid-cols-2 gap-2">
-        {topPills.map((pill) => (
-          <button
-            key={pill.id}
-            onClick={() => onSelectPill(pill.id)}
-            className={`py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all border ${
-              activePill === pill.id
-                ? 'bg-purple-600 border-purple-400 text-white shadow-lg shadow-purple-600/30'
-                : 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            <span>{pill.label}</span>
-          </button>
-        ))}
-      </div>
-    </section>
+    <div className="w-full bg-slate-900/80 backdrop-blur border-b border-slate-800 px-4 py-2 overflow-x-auto flex gap-2 no-scrollbar">
+      <button
+        onClick={() => handleSelect('flashcards')}
+        className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition ${
+          abaAtiva === 'flashcards'
+            ? 'bg-indigo-600 text-white shadow-sm'
+            : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+        }`}
+      >
+        Visão Principal
+      </button>
+    </div>
   );
 };
-
