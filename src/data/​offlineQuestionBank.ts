@@ -1,56 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import { WifiOff, Database, CheckCircle2 } from 'lucide-react';
+export interface Question {
+  id: string;
+  statement: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+  subject: string;
+  topic: string;
+  year?: number;
+}
 
-export const OfflineStatusBanner: React.FC = () => {
-  const [isOnline, setIsOnline] = useState<boolean>(
-    typeof navigator !== 'undefined' ? navigator.onLine : true
-  );
-  const [showReconnected, setShowReconnected] = useState<boolean>(false);
-
-  useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-      setShowReconnected(true);
-      const timer = setTimeout(() => setShowReconnected(false), 4000);
-      return () => clearTimeout(timer);
-    };
-
-    const handleOffline = () => {
-      setIsOnline(false);
-      setShowReconnected(false);
-    };
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
-  if (isOnline && !showReconnected) {
-    return null;
+export const offlineQuestionBank: Question[] = [
+  {
+    id: "offline-1",
+    statement: "No ENEM, a interpretação de texto é fundamental. Qual das alternativas melhor define a função da metalinguagem?",
+    options: [
+      "Focar no canal de comunicação.",
+      "Usar o código para explicar o próprio código.",
+      "Expressar as emoções do emissor.",
+      "Persuadir o receptor da mensagem."
+    ],
+    correctAnswer: 1,
+    explanation: "A função metalinguística ocorre quando a linguagem fala sobre si mesma (ex: um poema que fala sobre fazer poesia).",
+    subject: "Linguagens",
+    topic: "Funções da Linguagem"
+  },
+  {
+    id: "offline-2",
+    statement: "Considerando a Primeira Lei de Newton (Lei da Inércia), o que acontece com um corpo em movimento se a força resultante sobre ele for nula?",
+    options: [
+      "Ele para imediatamente.",
+      "Ele acelera uniformemente.",
+      "Ele continua em movimento retilíneo uniforme.",
+      "Ele muda de direção."
+    ],
+    correctAnswer: 2,
+    explanation: "Pela Primeira Lei de Newton, se a força resultante é zero, o corpo mantém seu estado de repouso ou de movimento retilíneo uniforme.",
+    subject: "Ciências da Natureza",
+    topic: "Física - Leis de Newton"
   }
+];
 
-  if (showReconnected) {
-    return (
-      <div className="bg-emerald-600 text-white text-xs font-bold py-2 px-4 text-center flex items-center justify-center space-x-2 animate-in fade-in transition-all">
-        <CheckCircle2 className="w-4 h-4" />
-        <span>Conexão reestabelecida! O gerador de IA está novamente ativo.</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-amber-500 text-slate-950 text-xs font-bold py-2.5 px-4 text-center flex items-center justify-center space-x-2 shadow-md animate-in fade-in transition-all">
-      <WifiOff className="w-4 h-4 shrink-0" />
-      <span>
-        Você está navegando sem internet (Modo Offline). Todo seu histórico de resumos, planos e explicações está salvo no IndexedDB e acessível sem conexão!
-      </span>
-      <span className="hidden md:inline-flex items-center space-x-1 bg-amber-600/30 px-2 py-0.5 rounded-md text-[11px] font-extrabold ml-2 border border-amber-600/40">
-        <Database className="w-3 h-3 mr-1" /> IndexedDB Ativo
-      </span>
-    </div>
-  );
-};
+export default offlineQuestionBank;
