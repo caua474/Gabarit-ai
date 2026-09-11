@@ -186,6 +186,10 @@ export const OFFLINE_QUESTION_BANK: OfflineQuestion[] = [
   }
 ];
 
+export type Question = OfflineQuestion;
+
+export const offlineQuestionBank = OFFLINE_QUESTION_BANK;
+
 export function getRandomOfflineQuestions(materia?: string, count: number = 5): OfflineQuestion[] {
   let list = OFFLINE_QUESTION_BANK;
   if (materia) {
@@ -199,3 +203,5 @@ export function getRandomOfflineQuestions(materia?: string, count: number = 5): 
   const shuffled = [...list].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
 }
+
+export default OFFLINE_QUESTION_BANK;
