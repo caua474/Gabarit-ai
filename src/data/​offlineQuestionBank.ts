@@ -2,7 +2,7 @@ export interface OfflineQuestion {
   id: string;
   materia: string;
   topico: string;
-  pergunta: string;
+  pergunta: string; 
   opcoes: string[];
   resposta_correta_index: number;
   explicacao: string;
