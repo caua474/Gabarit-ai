@@ -1,4 +1,0 @@
-# Força o Git a reconhecer os arquivos de dados exatamente como estão nomeados
-git add -f src/data/enemCatalog.ts
-git add -f src/data/offlineQuestionBank.ts
-git add -f src/data/digitalLibraryCatalog.ts
