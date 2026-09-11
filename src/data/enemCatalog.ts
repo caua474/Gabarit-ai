@@ -3,7 +3,7 @@ export interface SubjectArea {
   title: string;
   topics: string[];
 }
- 
+
 export const enemCatalog: SubjectArea[] = [
   {
     id: "linguagens",
@@ -27,4 +27,4 @@ export const enemCatalog: SubjectArea[] = [
   }
 ];
 
-/*export default enemCatalog;
+export default enemCatalog;
